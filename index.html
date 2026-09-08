@@ -24,7 +24,6 @@
             color: #0f172a;
         }
 
-        /* FORMATO HORIZONTAL DE CARTAS */
         .card-container {
             display: flex;
             flex-direction: column;
@@ -63,18 +62,27 @@
             min-width: 90px;
             height: 90px;
             background: #f8fafc;
-            border: 1px dashed #cbd5e1;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            padding: 4px;
+            box-sizing: border-box;
         }
 
         .card-media img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .card-media svg {
+            width: 50px;
+            height: 50px;
+            opacity: 0.85;
         }
 
         .card-content {
@@ -192,26 +200,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        const SVG_ECUACION = `<svg viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2"><path d="M4 19l6-14 4 14 6-14"/></svg>`;
+        const SVG_DOMINIO = `<svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="6" stroke-dasharray="2 2"/></svg>`;
+
+        // MAZO ACTUALIZADO CON GRÁFICAS 3D
         const deckMaster = [
-            { id: 1, family: 'elipsoide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'ELIPSOIDE', formula: 'Modelo AR / QR', desc: 'Modelo tridimensional interactivo en realidad aumentada.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 2, family: 'elipsoide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'ELIPSOIDE', formula: 'x²/9 + y²/16 + z²/4 = 1', desc: 'Ecuación canónica reducida de la superficie elíptica.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 3, family: 'elipsoide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'ELIPSOIDE', formula: '4x² + 4y² + z² = 100', desc: 'Depósito industrial de gas de la forma 4x² + 4y² + z² = 100.', footer: 'APLICACIÓN COTIDIANA', img: '' },
-            { id: 4, family: 'elipsoide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'ELIPSOIDE', formula: 'Dom: {-3≤x≤3, -4≤y≤4}', desc: 'Región elíptica cerrada en el plano xy. Al cortar con x=2 genera traza elíptica.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            // CUARTETO 1: ELIPSOIDE
+            { id: 1, family: 'elipsoide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'ELIPSOIDE', formula: 'Gráfica 3D', desc: 'Superficie tridimensional cerrada y acotada en los tres ejes coordinados.', footer: 'GRÁFICA 3D', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Ellipsoid_3d.png/240px-Ellipsoid_3d.png' },
+            { id: 2, family: 'elipsoide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'ELIPSOIDE', formula: 'x²/9 + y²/16 + z²/4 = 1', desc: 'Ecuación canónica reducida de la superficie elíptica.', footer: 'ECUACIÓN CANÓNICA', svg: SVG_ECUACION },
+            { id: 3, family: 'elipsoide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'ELIPSOIDE', formula: '4x² + 4y² + z² = 100', desc: 'Depósito industrial de gas de la forma 4x² + 4y² + z² = 100.', footer: 'APLICACIÓN COTIDIANA', img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=150&auto=format&fit=crop&q=80' },
+            { id: 4, family: 'elipsoide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'ELIPSOIDE', formula: 'Dom: {-3≤x≤3, -4≤y≤4}', desc: 'Región elíptica cerrada en el plano xy. Al cortar con x=2 genera traza elíptica.', footer: 'CÁLCULO MULTIVARIABLE', svg: SVG_DOMINIO },
 
-            { id: 5, family: 'paraboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE', formula: 'Vértice V(1,1,-1)', desc: 'Superficie en forma de copa con vértice desplazado.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 6, family: 'paraboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE', formula: 'y-1 = 2(x-1)² + 2(z+1)²', desc: 'Ecuación canónica reducida de 2x² + 2z² - 4x - y + 4z + 5 = 0.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 7, family: 'paraboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE', formula: 'Antena Parabólica', desc: 'Antena parabólica receptora utilizada para concentración de señales.', footer: 'APLICACIÓN COTIDIANA', img: '' },
-            { id: 8, family: 'paraboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE', formula: 'Dom: ℝ²', desc: 'Definida para todo punto (x,z) en ℝ². Posee punto mínimo en V(1,1,-1).', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            // CUARTETO 2: PARABOLOIDE
+            { id: 5, family: 'paraboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE', formula: 'Gráfica 3D', desc: 'Superficie en forma de copa con vértice desplazado en V(1,1,-1).', footer: 'GRÁFICA 3D', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Paraboloid_of_revolution.svg/240px-Paraboloid_of_revolution.svg.png' },
+            { id: 6, family: 'paraboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE', formula: 'y-1 = 2(x-1)² + 2(z+1)²', desc: 'Ecuación canónica reducida de 2x² + 2z² - 4x - y + 4z + 5 = 0.', footer: 'ECUACIÓN CANÓNICA', svg: SVG_ECUACION },
+            { id: 7, family: 'paraboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE', formula: 'Antena Parabólica', desc: 'Antena parabólica receptora utilizada para concentración de señales.', footer: 'APLICACIÓN COTIDIANA', img: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=150&auto=format&fit=crop&q=80' },
+            { id: 8, family: 'paraboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE', formula: 'Dom: ℝ²', desc: 'Definida para todo punto (x,z) en ℝ². Posee punto mínimo en V(1,1,-1).', footer: 'CÁLCULO MULTIVARIABLE', svg: SVG_DOMINIO },
 
-            { id: 9, family: 'silla', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Punto Silla (0,0,0)', desc: 'Visualización 3D con punto de silla crítico en el origen (0,0,0).', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 10, family: 'silla', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'z = y² - 4x²', desc: 'Superficie en forma de silla de montar con trazas hiperbólicas.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 11, family: 'silla', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Papa Pringles / Cubierta', desc: 'Snack de papa o cubierta arquitectónica de doble curvatura.', footer: 'APLICACIÓN COTIDIANA', img: '' },
-            { id: 12, family: 'silla', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Dom: ℝ²', desc: 'Cortes con z=4 y z=-4 forman hipérbolas. El plano z=0 forma dos rectas.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            // CUARTETO 3: PARABOLOIDE HIPERBÓLICO
+            { id: 9, family: 'silla', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Gráfica 3D', desc: 'Visualización en 3D con punto de silla crítico en el origen (0,0,0).', footer: 'GRÁFICA 3D', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Saddle_point.svg/240px-Saddle_point.svg.png' },
+            { id: 10, family: 'silla', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'z = y² - 4x²', desc: 'Superficie en forma de silla de montar con trazas hiperbólicas.', footer: 'ECUACIÓN CANÓNICA', svg: SVG_ECUACION },
+            { id: 11, family: 'silla', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Papa Pringles / Cubierta', desc: 'Snack de papa o cubierta arquitectónica de doble curvatura.', footer: 'APLICACIÓN COTIDIANA', img: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=150&auto=format&fit=crop&q=80' },
+            { id: 12, family: 'silla', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Dom: ℝ²', desc: 'Cortes con z=4 y z=-4 forman hipérbolas. El plano z=0 forma dos rectas.', footer: 'CÁLCULO MULTIVARIABLE', svg: SVG_DOMINIO },
 
-            { id: 13, family: 'hiperboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Hoja Sup. z ≥ 5', desc: 'Visualización en realidad aumentada para z ≥ 5 m.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 14, family: 'hiperboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'z² - x² - y² = 25 (z≥5)', desc: 'Hoja superior de un hiperboloide con altura inicial z = 5 m.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 15, family: 'hiperboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Faro Acústico Industrial', desc: 'Estructura de ingeniería de un faro acústico industrial.', footer: 'APLICACIÓN COTIDIANA', img: '' },
-            { id: 16, family: 'hiperboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Radio r = 12m (z=13m)', desc: 'Corte horizontal a z=13 m genera sección circular de radio 12 m.', footer: 'CÁLCULO MULTIVARIABLE', img: '' }
+            // CUARTETO 4: HIPERBOLOIDE 2 HOJAS
+            { id: 13, family: 'hiperboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Gráfica 3D', desc: 'Visualización de la hoja superior para z ≥ 5 m.', footer: 'GRÁFICA 3D', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/HyperboloidOfTwoSheets.png/240px-HyperboloidOfTwoSheets.png' },
+            { id: 14, family: 'hiperboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'z² - x² - y² = 25 (z≥5)', desc: 'Hoja superior de un hiperboloide con altura inicial z = 5 m.', footer: 'ECUACIÓN CANÓNICA', svg: SVG_ECUACION },
+            { id: 15, family: 'hiperboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Faro Acústico Industrial', desc: 'Estructura de ingeniería de un faro acústico industrial.', footer: 'APLICACIÓN COTIDIANA', img: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=150&auto=format&fit=crop&q=80' },
+            { id: 16, family: 'hiperboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Radio r = 12m (z=13m)', desc: 'Corte horizontal a z=13 m genera sección circular de radio 12 m.', footer: 'CÁLCULO MULTIVARIABLE', svg: SVG_DOMINIO }
         ];
 
         const PENITENCIAS = [
@@ -298,7 +314,6 @@
                         }
                     }
 
-                    // ROTACIÓN DE CARTAS AUTOMÁTICA AL LLEGAR A 4 DESCARTES
                     if (descartesCount === 4 && !isRotating) {
                         isRotating = true;
                         ejecutarRotacionSimultanea(data.hands, data.descartes);
@@ -346,9 +361,12 @@
                 const cardEl = document.createElement('div');
                 cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
                 
-                let mediaContent = card.img 
-                    ? `<img src="${card.img}" alt="Carta">` 
-                    : `<span style="font-size:0.65rem; color:#94a3b8; text-align:center; padding:4px;">${card.badge}</span>`;
+                let mediaContent = '';
+                if (card.img) {
+                    mediaContent = `<img src="${card.img}" alt="Media">`;
+                } else if (card.svg) {
+                    mediaContent = card.svg;
+                }
 
                 cardEl.innerHTML = `
                     <div class="card-media">${mediaContent}</div>
