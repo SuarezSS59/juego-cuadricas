@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Cuádricas - Salas por Grupo</title>
+    <style>
+        :root {
+            --blue: #2563eb;
+            --orange: #ea580c;
+            --green: #16a34a;
+            --slate: #334155;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 12px;
+            color: #0f172a;
+            text-align: center;
+        }
+
+        /* PANTALLA DE SELECCIÓN DE SALA */
+        #room-select {
+            max-width: 400px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-room {
+            background-color: var(--blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* PANTALLA DE JUEGO */
+        #game-screen { display: none; }
+
+        .header-status {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px 6px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            border: 3px solid #cbd5e1;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .card.selected { border-color: var(--blue); background-color: #eff6ff; }
+        .card.matched { border-color: var(--green); background-color: #f0fdf4; opacity: 0.5; pointer-events: none; }
+
+        .card-type {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .type-visual { background-color: var(--blue); }
+        .type-ecuacion { background-color: var(--orange); }
+        .type-objeto { background-color: var(--green); }
+        .type-dominio { background-color: var(--slate); }
+
+        .card-title { font-weight: 800; font-size: 0.8rem; }
+        .card-content { font-size: 0.75rem; margin-top: 4px; color: #334155; }
+
+        .btn-change {
+            background-color: var(--slate);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA 1: ELECCIÓN DE GRUPO -->
+    <div id="room-select">
+        <h2>JUEGO DE CUÁDRICAS</h2>
+        <p>Selecciona el número de tu Grupo para ingresar a tu sala:</p>
+        <div class="room-grid" id="rooms-container"></div>
+    </div>
+
+    <!-- PANTALLA 2: TABLERO DE JUEGO -->
+    <div id="game-screen">
+        <div class="header-status">
+            <div>GRUPO: <span id="display-room" style="color:var(--blue);">1</span></div>
+            <div>PUNTOS: <span id="score">0</span></div>
+            <div>TIEMPO: <span id="timer">0s</span></div>
+        </div>
+
+        <div class="game-board" id="board"></div>
+
+        <button class="btn-change" onclick="leaveRoom()">Cambiar de Grupo</button>
+    </div>
+
+    <script>
+        const cardsData = [
+            { id: 1, family: 'elipsoide', type: 'visual', label: 'VISUAL 3D', title: 'ELIPSOIDE', content: 'Modelo 3D Interactivo AR' },
+            { id: 2, family: 'elipsoide', type: 'ecuacion', label: 'ECUACIÓN', title: 'ELIPSOIDE', content: 'x²/9 + y²/16 + z²/4 = 1' },
+            { id: 3, family: 'elipsoide', type: 'objeto', label: 'OBJETO REAL', title: 'ELIPSOIDE', content: 'Tanque Industrial de Gas' },
+            { id: 4, family: 'elipsoide', type: 'dominio', label: 'DOMINIO', title: 'ELIPSOIDE', content: 'Dom: {-3 ≤ x ≤ 3, -4 ≤ y ≤ 4}' },
+            
+            { id: 5, family: 'paraboloide', type: 'visual', label: 'VISUAL 3D', title: 'PARABOLOIDE', content: 'Vértice V(1,1,-1)' },
+            { id: 6, family: 'paraboloide', type: 'ecuacion', label: 'ECUACIÓN', title: 'PARABOLOIDE', content: 'y - 1 = 2(x-1)² + 2(z+1)²' },
+            { id: 7, family: 'paraboloide', type: 'objeto', label: 'OBJETO REAL', title: 'PARABOLOIDE', content: 'Antena Parabólica' },
+            { id: 8, family: 'paraboloide', type: 'dominio', label: 'DOMINIO', title: 'PARABOLOIDE', content: 'Dom: ℝ²' },
+
+            { id: 9, family: 'silla', type: 'visual', label: 'VISUAL 3D', title: 'PARAB. HIPERBÓLICO', content: 'Punto Silla (0,0,0)' },
+            { id: 10, family: 'silla', type: 'ecuacion', label: 'ECUACIÓN', title: 'PARAB. HIPERBÓLICO', content: 'z = y² - 4x²' },
+            { id: 11, family: 'silla', type: 'objeto', label: 'OBJETO REAL', title: 'PARAB. HIPERBÓLICO', content: 'Papa Pringles / Cubierta' },
+            { id: 12, family: 'silla', type: 'dominio', label: 'DOMINIO', title: 'PARAB. HIPERBÓLICO', content: 'Corte z=0 forma 2 rectas' },
+
+            { id: 13, family: 'hiperboloide', type: 'visual', label: 'VISUAL 3D', title: 'HIPERBOLOIDE 2H', content: 'Hoja superior z ≥ 5' },
+            { id: 14, family: 'hiperboloide', type: 'ecuacion', label: 'ECUACIÓN', title: 'HIPERBOLOIDE 2H', content: 'z² - x² - y² = 25' },
+            { id: 15, family: 'hiperboloide', type: 'objeto', label: 'OBJETO REAL', title: 'HIPERBOLOIDE 2H', content: 'Faro Acústico Industrial' },
+            { id: 16, family: 'hiperboloide', type: 'dominio', label: 'DOMINIO', title: 'HIPERBOLOIDE 2H', content: 'Corte z=13 genera r=12m' }
+        ];
+
+        let selectedCards = [];
+        let score = 0;
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let currentRoom = 1;
+
+        // Generar botones para los 10 grupos
+        const roomsContainer = document.getElementById('rooms-container');
+        for (let i = 1; i <= 10; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-room';
+            btn.innerText = `Grupo ${i}`;
+            btn.onclick = () => enterRoom(i);
+            roomsContainer.appendChild(btn);
+        }
+
+        // Generador pseudo-aleatorio basado en el número de grupo
+        function seededRandom(seed) {
+            let x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function shuffleSeeded(array, seed) {
+            let m = array.length, t, i;
+            while (m) {
+                i = Math.floor(seededRandom(seed++) * m--);
+                t = array[m];
+                array[m] = array[i];
+                array[i] = t;
+            }
+            return array;
+        }
+
+        function enterRoom(roomNumber) {
+            currentRoom = roomNumber;
+            document.getElementById('display-room').innerText = roomNumber;
+            document.getElementById('room-select').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+
+            initGame();
+        }
+
+        function leaveRoom() {
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('room-select').style.display = 'block';
+        }
+
+        function initGame() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            selectedCards = [];
+            score = 0;
+            timerSeconds = 0;
+            document.getElementById('score').innerText = score;
+            document.getElementById('timer').innerText = '0s';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                document.getElementById('timer').innerText = `${timerSeconds}s`;
+            }, 1000);
+
+            // Mezcla única fijada por el número del grupo
+            const shuffled = shuffleSeeded([...cardsData], currentRoom * 100);
+
+            shuffled.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.dataset.family = card.family;
+
+                cardEl.innerHTML = `
+                    <span class="card-type type-${card.type}">${card.label}</span>
+                    <div class="card-title">${card.title}</div>
+                    <div class="card-content">${card.content}</div>
+                `;
+
+                cardEl.onclick = () => selectCard(cardEl);
+                board.appendChild(cardEl);
+            });
+        }
+
+        function selectCard(cardEl) {
+            if (selectedCards.length < 2 && !cardEl.classList.contains('selected')) {
+                cardEl.classList.add('selected');
+                selectedCards.push(cardEl);
+
+                if (selectedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = selectedCards;
+
+            if (card1.dataset.family === card2.dataset.family) {
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+                    selectedCards = [];
+
+                    if (document.querySelectorAll('.card.matched').length === cardsData.length) {
+                        clearInterval(timerInterval);
+                        alert(`¡Felicidades Grupo ${currentRoom}! Completaron el juego en ${timerSeconds} segundos.`);
+                    }
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                    selectedCards = [];
+                }, 700);
+            }
+        }
+    </script>
+</body>
+</html>
