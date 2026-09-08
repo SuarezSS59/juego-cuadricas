@@ -24,12 +24,13 @@
             color: #0f172a;
         }
 
+        /* FORMATO HORIZONTAL DE CARTAS */
         .card-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
@@ -37,14 +38,18 @@
             background: white;
             border: 2px solid #94a3b8;
             border-radius: 12px;
-            padding: 12px;
-            width: 90%;
+            padding: 10px;
+            width: 95%;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
             text-align: left;
-            position: relative;
             cursor: pointer;
             transition: transform 0.15s, border-color 0.15s;
             user-select: none;
+            box-sizing: border-box;
         }
 
         .card.selected {
@@ -53,23 +58,44 @@
             transform: scale(1.02);
         }
 
-        .card-header {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: #64748b;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+        .card-media {
+            width: 90px;
+            min-width: 90px;
+            height: 90px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
+        .card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header { font-size: 0.6rem; font-weight: 800; color: #64748b; letter-spacing: 0.5px; }
+
         .card-badge {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             color: white;
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
-            margin-bottom: 6px;
+            margin: 2px 0;
             text-transform: uppercase;
+            width: fit-content;
         }
 
         .badge-visual { background-color: var(--blue); }
@@ -77,48 +103,22 @@
         .badge-objeto { background-color: var(--green); }
         .badge-dominio { background-color: var(--slate); }
 
-        .card-title {
-            font-size: 0.95rem;
-            font-weight: 900;
-            color: #1e293b;
-            margin-bottom: 6px;
-        }
+        .card-title { font-size: 0.85rem; font-weight: 900; color: #1e293b; }
 
         .card-formula {
-            font-size: 1.05rem;
+            font-size: 0.9rem;
             font-weight: 800;
-            text-align: center;
             background: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            padding: 8px;
-            border-radius: 6px;
-            margin: 6px 0;
+            border: 1px solid #e2e8f0;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin: 4px 0;
             color: #0f172a;
+            text-align: center;
         }
 
-        .card-desc {
-            font-size: 0.8rem;
-            color: #475569;
-            line-height: 1.3;
-        }
-
-        .card-footer {
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #94a3b8;
-            text-align: right;
-            margin-top: 8px;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 4px;
-        }
-
-        .card-img {
-            width: 120px;
-            height: auto;
-            display: block;
-            margin: 6px auto;
-            border-radius: 6px;
-        }
+        .card-desc { font-size: 0.75rem; color: #475569; line-height: 1.2; }
+        .card-footer { font-size: 0.55rem; font-weight: 700; color: #94a3b8; text-align: right; margin-top: 4px; }
 
         .btn {
             background: var(--blue);
@@ -130,7 +130,7 @@
             font-size: 1rem;
             cursor: pointer;
             width: 100%;
-            max-width: 380px;
+            max-width: 500px;
             margin: 10px auto;
         }
 
@@ -153,7 +153,7 @@
             <br><br>
             <button class="btn" onclick="joinRoom()">Unirse a la Sala</button>
             <br><br>
-            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.8rem;" onclick="resetRoom()">Reiniciar esta sala en Firebase</button>
+            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.85rem;" onclick="resetRoom()">Limpiar / Reiniciar esta Sala</button>
         </div>
     </div>
 
@@ -162,7 +162,7 @@
         <h3>SALA DE ESPERA - GRUPO <span id="room-num"></span></h3>
         <p>Eres el <b style="color:var(--blue);">Jugador <span id="wait-player-id"></span></b></p>
         <p>Jugadores conectados: <b id="player-count" style="color:var(--blue); font-size:1.2rem;">1</b> / 4</p>
-        <p style="font-size:0.85rem; color:#64748b;">Esperando a que se completen los 4 integrantes para repartir...</p>
+        <p style="font-size:0.85rem; color:#64748b;">Esperando a los 4 integrantes...</p>
     </div>
 
     <!-- PANTALLA 3: JUEGO EN VIVO -->
@@ -192,31 +192,26 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // BASE DE DATOS EXACTA DE TUS CARTAS CON IMÁGENES DE QR
         const deckMaster = [
-            // CUARTETO 1: ELIPSOIDE
-            { id: 1, family: 'elipsoide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'ELIPSOIDE', formula: 'Modelo AR / QR', desc: 'Modelo tridimensional interactivo en realidad aumentada. Superficie tridimensional cerrada y acotada.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 2, family: 'elipsoide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'ELIPSOIDE', formula: 'x²/9 + y²/16 + z²/4 = 1', desc: 'Ecuación canónica reducida de la superficie elíptica.', footer: 'ECUACIÓN CANÓNICA' },
-            { id: 3, family: 'elipsoide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'ELIPSOIDE', formula: '4x² + 4y² + z² = 100', desc: 'Depósito industrial de gas de la forma 4x² + 4y² + z² = 100.', footer: 'APLICACIÓN COTIDIANA' },
-            { id: 4, family: 'elipsoide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'ELIPSOIDE', formula: 'Dom: {-3≤x≤3, -4≤y≤4}', desc: 'Región elíptica cerrada en el plano xy. Al cortar con x=2 genera una traza elíptica.', footer: 'CÁLCULO MULTIVARIABLE' },
+            { id: 1, family: 'elipsoide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'ELIPSOIDE', formula: 'Modelo AR / QR', desc: 'Modelo tridimensional interactivo en realidad aumentada.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
+            { id: 2, family: 'elipsoide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'ELIPSOIDE', formula: 'x²/9 + y²/16 + z²/4 = 1', desc: 'Ecuación canónica reducida de la superficie elíptica.', footer: 'ECUACIÓN CANÓNICA', img: '' },
+            { id: 3, family: 'elipsoide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'ELIPSOIDE', formula: '4x² + 4y² + z² = 100', desc: 'Depósito industrial de gas de la forma 4x² + 4y² + z² = 100.', footer: 'APLICACIÓN COTIDIANA', img: '' },
+            { id: 4, family: 'elipsoide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'ELIPSOIDE', formula: 'Dom: {-3≤x≤3, -4≤y≤4}', desc: 'Región elíptica cerrada en el plano xy. Al cortar con x=2 genera traza elíptica.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
 
-            // CUARTETO 2: PARABOLOIDE
-            { id: 5, family: 'paraboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE', formula: 'Vértice V(1,1,-1)', desc: 'Superficie en forma de copa con vértice desplazado en V(1,1,-1).', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 6, family: 'paraboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE', formula: 'y-1 = 2(x-1)² + 2(z+1)²', desc: 'Ecuación canónica reducida de 2x² + 2z² - 4x - y + 4z + 5 = 0.', footer: 'ECUACIÓN CANÓNICA' },
-            { id: 7, family: 'paraboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE', formula: 'Antena Parabólica', desc: 'Antena parabólica receptora utilizada para la concentración de señales.', footer: 'APLICACIÓN COTIDIANA' },
-            { id: 8, family: 'paraboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE', formula: 'Dom: ℝ²', desc: 'Definida para todo punto (x,z) en ℝ². Posee punto mínimo en el vértice V(1,1,-1).', footer: 'CÁLCULO MULTIVARIABLE' },
+            { id: 5, family: 'paraboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE', formula: 'Vértice V(1,1,-1)', desc: 'Superficie en forma de copa con vértice desplazado.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
+            { id: 6, family: 'paraboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE', formula: 'y-1 = 2(x-1)² + 2(z+1)²', desc: 'Ecuación canónica reducida de 2x² + 2z² - 4x - y + 4z + 5 = 0.', footer: 'ECUACIÓN CANÓNICA', img: '' },
+            { id: 7, family: 'paraboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE', formula: 'Antena Parabólica', desc: 'Antena parabólica receptora utilizada para concentración de señales.', footer: 'APLICACIÓN COTIDIANA', img: '' },
+            { id: 8, family: 'paraboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE', formula: 'Dom: ℝ²', desc: 'Definida para todo punto (x,z) en ℝ². Posee punto mínimo en V(1,1,-1).', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
 
-            // CUARTETO 3: PARABOLOIDE HIPERBÓLICO
-            { id: 9, family: 'silla', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Punto Silla (0,0,0)', desc: 'Visualización en 3D con punto de silla crítico en el origen (0,0,0).', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 10, family: 'silla', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'z = y² - 4x²', desc: 'Superficie en forma de silla de montar con trazas hiperbólicas en z constante.', footer: 'ECUACIÓN CANÓNICA' },
-            { id: 11, family: 'silla', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Papa Pringles / Cubierta', desc: 'Snack de papa o cubierta arquitectónica de doble curvatura.', footer: 'APLICACIÓN COTIDIANA' },
-            { id: 12, family: 'silla', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Dom: ℝ²', desc: 'Cortes con z=4 y z=-4 forman hipérbolas. El plano z=0 forma dos rectas.', footer: 'CÁLCULO MULTIVARIABLE' },
+            { id: 9, family: 'silla', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Punto Silla (0,0,0)', desc: 'Visualización 3D con punto de silla crítico en el origen (0,0,0).', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
+            { id: 10, family: 'silla', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'z = y² - 4x²', desc: 'Superficie en forma de silla de montar con trazas hiperbólicas.', footer: 'ECUACIÓN CANÓNICA', img: '' },
+            { id: 11, family: 'silla', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Papa Pringles / Cubierta', desc: 'Snack de papa o cubierta arquitectónica de doble curvatura.', footer: 'APLICACIÓN COTIDIANA', img: '' },
+            { id: 12, family: 'silla', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Dom: ℝ²', desc: 'Cortes con z=4 y z=-4 forman hipérbolas. El plano z=0 forma dos rectas.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
 
-            // CUARTETO 4: HIPERBOLOIDE 2 HOJAS
-            { id: 13, family: 'hiperboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Hoja Sup. z ≥ 5', desc: 'Visualización en realidad aumentada de la hoja superior para z ≥ 5 m.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
-            { id: 14, family: 'hiperboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'z² - x² - y² = 25 (z≥5)', desc: 'Hoja superior de un hiperboloide con altura mínima inicial en z = 5 m.', footer: 'ECUACIÓN CANÓNICA' },
-            { id: 15, family: 'hiperboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Faro Acústico Industrial', desc: 'Estructura de ingeniería de un faro acústico industrial.', footer: 'APLICACIÓN COTIDIANA' },
-            { id: 16, family: 'hiperboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Radio r = 12m (z=13m)', desc: 'Al realizar un corte horizontal a z=13 m se obtiene una sección circular de radio 12 m.', footer: 'CÁLCULO MULTIVARIABLE' }
+            { id: 13, family: 'hiperboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Hoja Sup. z ≥ 5', desc: 'Visualización en realidad aumentada para z ≥ 5 m.', footer: 'REALIDAD AUMENTADA', img: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.geogebra.org/m/m638k4ag' },
+            { id: 14, family: 'hiperboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'z² - x² - y² = 25 (z≥5)', desc: 'Hoja superior de un hiperboloide con altura inicial z = 5 m.', footer: 'ECUACIÓN CANÓNICA', img: '' },
+            { id: 15, family: 'hiperboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Faro Acústico Industrial', desc: 'Estructura de ingeniería de un faro acústico industrial.', footer: 'APLICACIÓN COTIDIANA', img: '' },
+            { id: 16, family: 'hiperboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Radio r = 12m (z=13m)', desc: 'Corte horizontal a z=13 m genera sección circular de radio 12 m.', footer: 'CÁLCULO MULTIVARIABLE', img: '' }
         ];
 
         const PENITENCIAS = [
@@ -229,11 +224,12 @@
         let playerId = null;
         let selectedCardIndex = null;
         let myHand = [];
+        let isRotating = false;
 
         function resetRoom() {
             const r = document.getElementById('input-room').value;
             db.ref('rooms/room_' + r).remove();
-            alert(`La sala ${r} ha sido reiniciada. Ya pueden ingresar los jugadores desde cero.`);
+            alert(`Sala ${r} completamente reiniciada.`);
         }
 
         function joinRoom() {
@@ -302,7 +298,9 @@
                         }
                     }
 
-                    if (descartesCount === 4 && playerId === 1) {
+                    // ROTACIÓN DE CARTAS AUTOMÁTICA AL LLEGAR A 4 DESCARTES
+                    if (descartesCount === 4 && !isRotating) {
+                        isRotating = true;
                         ejecutarRotacionSimultanea(data.hands, data.descartes);
                     }
                 }
@@ -348,16 +346,20 @@
                 const cardEl = document.createElement('div');
                 cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
                 
-                let imgHTML = card.img ? `<img src="${card.img}" class="card-img" alt="QR">` : '';
+                let mediaContent = card.img 
+                    ? `<img src="${card.img}" alt="Carta">` 
+                    : `<span style="font-size:0.65rem; color:#94a3b8; text-align:center; padding:4px;">${card.badge}</span>`;
 
                 cardEl.innerHTML = `
-                    <div class="card-header">JUEGO DE CARTAS: CUÁDRICAS</div>
-                    <span class="card-badge ${card.badgeClass}">${card.badge}</span>
-                    <div class="card-title">${card.title}</div>
-                    ${imgHTML}
-                    <div class="card-formula">${card.formula}</div>
-                    <div class="card-desc">${card.desc}</div>
-                    <div class="card-footer">${card.footer}</div>
+                    <div class="card-media">${mediaContent}</div>
+                    <div class="card-content">
+                        <div class="card-header">CUÁDRICAS</div>
+                        <span class="card-badge ${card.badgeClass}">${card.badge}</span>
+                        <div class="card-title">${card.title}</div>
+                        <div class="card-formula">${card.formula}</div>
+                        <div class="card-desc">${card.desc}</div>
+                        <div class="card-footer">${card.footer}</div>
+                    </div>
                 `;
 
                 cardEl.onclick = () => {
@@ -383,6 +385,11 @@
         }
 
         function ejecutarRotacionSimultanea(currentHands, descartes) {
+            if (playerId !== 1) {
+                isRotating = false;
+                return; 
+            }
+
             let newHands = JSON.parse(JSON.stringify(currentHands));
 
             for (let p = 1; p <= 4; p++) {
@@ -398,6 +405,8 @@
             db.ref(`rooms/room_${roomId}`).update({
                 hands: newHands,
                 descartes: {}
+            }).then(() => {
+                isRotating = false;
             });
         }
 
