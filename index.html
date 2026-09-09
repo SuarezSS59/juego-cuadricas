@@ -277,7 +277,7 @@
                 </ul>
             </div>
 
-            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Limpiar / Reiniciar esta Sala</button>
+            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Reiniciar esta Sala (Solo si está atascada)</button>
         </div>
     </div>
 
@@ -361,11 +361,20 @@
             document.getElementById('selected-room-lbl').innerText = num;
         }
 
+        // PROTECCIÓN ANTI-TROLEO EN REINICIO
         function resetRoom() {
-            db.ref('rooms/room_' + roomId).remove();
-            alert(`Sala ${roomId} completamente reiniciada.`);
+            db.ref('rooms/room_' + roomId).once('value', (snap) => {
+                const room = snap.val();
+                if (room && room.gameState === 'playing') {
+                    alert(`⚠️ La sala ${roomId} tiene una partida activa de 4 jugadores. No se puede reiniciar mientras juegan.`);
+                } else {
+                    db.ref('rooms/room_' + roomId).remove();
+                    alert(`Sala ${roomId} ha sido reiniciada con éxito.`);
+                }
+            });
         }
 
+        // BLOQUEO DE SALA LLENA O PARTIDA EN CURSO
         function joinRoom() {
             document.getElementById('room-num').innerText = roomId;
             document.getElementById('display-room-num').innerText = roomId;
@@ -374,20 +383,26 @@
 
             roomRef.transaction((room) => {
                 if (!room) {
-                    room = { playersCount: 0, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
+                    return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
                 }
-                if (room.playersCount < 4) {
-                    room.playersCount++;
+                
+                // Si la sala está en juego o ya tiene 4 personas, RECHAZAR EL INGRESO
+                if (room.gameState === 'playing' || room.gameState === 'cuadricas_claimed' || room.playersCount >= 4) {
+                    return; // Abortar transacción
                 }
+
+                room.playersCount++;
                 return room;
             }, (error, committed, snapshot) => {
-                if (committed) {
+                if (committed && snapshot.val()) {
                     playerId = snapshot.val().playersCount;
                     document.getElementById('my-player-id').innerText = playerId;
                     document.getElementById('wait-player-id').innerText = playerId;
                     document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
                     listenRoom();
+                } else {
+                    alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en una partida activa. Elige otra sala.`);
                 }
             });
         }
@@ -571,7 +586,6 @@
             });
         }
 
-        // LÓGICA DE DETECCIÓN EXACTA DEL ÚLTIMO JUGADOR
         function touchTable() {
             if (hasTouchedTable) return;
             
@@ -584,16 +598,12 @@
                 if (room) {
                     if (!room.reactions) room.reactions = [];
                     
-                    // Solo registrar la reacción si este jugador aún no está en la lista
                     if (!room.reactions.includes(playerId)) {
                         room.reactions.push(playerId);
                     }
 
-                    // Cuando 3 de los 4 jugadores han puesto la mano
                     if (room.reactions.length === 3) {
                         const allPlayers = [1, 2, 3, 4];
-                        
-                        // El perdedor es el ÚNICO jugador de los 4 que no está en las reacciones ni es el ganador
                         let loser = allPlayers.find(p => p !== room.winner && !room.reactions.includes(p));
                         
                         room.gameState = 'finished';
