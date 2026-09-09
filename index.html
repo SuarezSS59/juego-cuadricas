@@ -277,7 +277,7 @@
                 </ul>
             </div>
 
-            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Forzar Reinicio de esta Sala</button>
+            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Reiniciar esta Sala</button>
         </div>
     </div>
 
@@ -365,8 +365,10 @@
         }
 
         function resetRoom() {
-            db.ref('rooms/room_' + roomId).remove();
-            alert(`Sala ${roomId} reiniciada por completo.`);
+            db.ref('rooms/room_' + roomId).remove().then(() => {
+                alert(`Sala ${roomId} ha sido reiniciada con éxito.`);
+                location.reload();
+            });
         }
 
         function joinRoom() {
@@ -384,36 +386,19 @@
                     return; 
                 }
 
-                room.playersCount++;
+                room.playersCount = (room.playersCount || 0) + 1;
                 return room;
             }, (error, committed, snapshot) => {
-                if (committed && snapshot.val()) {
+                if (committed && snapshot.exists()) {
                     playerId = snapshot.val().playersCount;
                     document.getElementById('my-player-id').innerText = playerId;
                     document.getElementById('wait-player-id').innerText = playerId;
                     document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
 
-                    // CONFIGURAR DETECCIÓN DE DESCONEXIÓN AUTO-CLEANUP
-                    setupDisconnectHandler();
                     listenRoom();
                 } else {
-                    alert(`⚠️ El Grupo ${roomId} ya está lleno o en juego. Elige otra sala.`);
-                }
-            });
-        }
-
-        function setupDisconnectHandler() {
-            const roomRef = db.ref('rooms/room_' + roomId);
-            
-            // Si el usuario cierra el navegador o se desconecta
-            roomRef.child('playersCount').onDisconnect().transaction((count) => {
-                if (count && count > 1) {
-                    return count - 1;
-                } else {
-                    // Si era el último en la sala, borrarla por completo
-                    roomRef.onDisconnect().remove();
-                    return 0;
+                    alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en juego. Selecciona otra sala o utiliza "Reiniciar esta Sala".`);
                 }
             });
         }
@@ -421,8 +406,14 @@
         function leaveRoom() {
             if (roomId && playerId) {
                 const roomRef = db.ref('rooms/room_' + roomId);
-                roomRef.child('playersCount').transaction((count) => {
-                    return (count && count > 1) ? count - 1 : 0;
+                roomRef.transaction((room) => {
+                    if (room) {
+                        room.playersCount = Math.max(0, (room.playersCount || 1) - 1);
+                        if (room.playersCount === 0) {
+                            return null; // Borrar sala si queda vacía
+                        }
+                    }
+                    return room;
                 }).then(() => {
                     location.reload();
                 });
@@ -438,9 +429,10 @@
                 const data = snapshot.val();
                 if (!data) return;
 
-                document.getElementById('player-count').innerText = data.playersCount || 0;
+                const count = data.playersCount || 0;
+                document.getElementById('player-count').innerText = count;
 
-                if (data.playersCount === 4 && data.gameState === 'waiting' && playerId === 1) {
+                if (count === 4 && data.gameState === 'waiting' && playerId === 1) {
                     dealCards();
                 }
 
