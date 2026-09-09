@@ -27,7 +27,6 @@
             color: #0f172a;
         }
 
-        /* BANNER SUPERIOR */
         .app-header {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
             color: white;
@@ -53,7 +52,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* CONTENEDORES LOBBY Y JUEGO */
         .lobby-card {
             background: white;
             padding: 24px;
@@ -65,7 +63,6 @@
             box-sizing: border-box;
         }
 
-        /* GRID SELECTOR DE SALAS */
         .rooms-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -93,7 +90,6 @@
             box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
         }
 
-        /* CARTAS Y REGLAS */
         .rules-box {
             background: #f8fafc;
             border: 1px dashed #cbd5e1;
@@ -205,7 +201,6 @@
         .card-desc { font-size: 0.75rem; color: #475569; line-height: 1.2; }
         .card-footer { font-size: 0.55rem; font-weight: 700; color: #94a3b8; text-align: right; margin-top: 4px; }
 
-        /* BOTONES DE ACCIÓN */
         .btn {
             background: var(--blue);
             color: white;
@@ -219,18 +214,32 @@
             max-width: 500px;
             margin: 10px auto;
             box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
         }
 
         .btn:hover { background: var(--blue-hover); }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
         .btn-cuadricas { background: var(--green); font-size: 1.4rem; padding: 18px; display: none; }
-        .btn-mesa { background: #dc2626; font-size: 1.4rem; padding: 18px; display: none; }
+        
+        /* ESTILO Y EFECTO TRANSPARENTE AL PRESIONAR "PONER MANO EN LA MESA" */
+        .btn-mesa { 
+            background: #dc2626; 
+            font-size: 1.4rem; 
+            padding: 18px; 
+            display: none; 
+        }
+        .btn-mesa:disabled {
+            background: #dc2626 !important;
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
 
-    <!-- ENCABEZADO PRINCIPAL -->
     <div class="app-header">
         <svg style="width:36px; height:36px; fill:none; stroke:white; stroke-width:2; margin-bottom:4px;" viewBox="0 0 24 24">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -239,7 +248,7 @@
         <p>JUEGO INTERACTIVO | CÁLCULO MULTIVARIABLE</p>
     </div>
 
-    <!-- PANTALLA 1: LOBBY DE INGRESO DECORADO -->
+    <!-- PANTALLA 1: LOBBY -->
     <div id="screen-lobby">
         <div class="lobby-card">
             <h3 style="margin-top:0; font-size:1.1rem; color:#1e293b;">Selecciona tu Grupo de Juego</h3>
@@ -259,7 +268,6 @@
 
             <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
 
-            <!-- REGLAS RÁPIDAS -->
             <div class="rules-box">
                 <b>📌 Reglas Rápidas:</b>
                 <ul style="margin: 6px 0 0 0; padding-left: 16px;">
@@ -433,6 +441,7 @@
                         const btnMesa = document.getElementById('btn-mesa');
                         btnMesa.style.display = 'block';
                         btnMesa.disabled = false;
+                        btnMesa.innerText = "¡PONER MANO EN LA MESA!";
                         document.getElementById('btn-cuadricas').style.display = 'none';
                         document.getElementById('btn-pass').style.display = 'none';
                     }
@@ -553,12 +562,14 @@
             });
         }
 
+        // FUNCIÓN CON DESHABILITACIÓN E OPACIDAD INMEDIATA
         function touchTable() {
             const btnMesa = document.getElementById('btn-mesa');
             if (btnMesa.disabled) return;
             
+            // Bloquea inmediatamente el botón
             btnMesa.disabled = true;
-            btnMesa.style.display = 'none';
+            btnMesa.innerText = "¡MANO PUESTA!";
             
             db.ref('rooms/room_' + roomId).transaction((room) => {
                 if (room) {
