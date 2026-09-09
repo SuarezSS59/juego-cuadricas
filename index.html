@@ -361,7 +361,6 @@
             document.getElementById('selected-room-lbl').innerText = num;
         }
 
-        // PROTECCIÓN ANTI-TROLEO EN REINICIO
         function resetRoom() {
             db.ref('rooms/room_' + roomId).once('value', (snap) => {
                 const room = snap.val();
@@ -374,7 +373,6 @@
             });
         }
 
-        // BLOQUEO DE SALA LLENA O PARTIDA EN CURSO
         function joinRoom() {
             document.getElementById('room-num').innerText = roomId;
             document.getElementById('display-room-num').innerText = roomId;
@@ -386,9 +384,8 @@
                     return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
                 }
                 
-                // Si la sala está en juego o ya tiene 4 personas, RECHAZAR EL INGRESO
                 if (room.gameState === 'playing' || room.gameState === 'cuadricas_claimed' || room.playersCount >= 4) {
-                    return; // Abortar transacción
+                    return; 
                 }
 
                 room.playersCount++;
@@ -453,6 +450,7 @@
                 }
 
                 if (data.gameState === 'cuadricas_claimed') {
+                    // Muestra el botón de la mesa a TODOS los que no son el ganador
                     if (data.winner !== playerId) {
                         const btnMesa = document.getElementById('btn-mesa');
                         btnMesa.style.display = 'block';
@@ -586,6 +584,7 @@
             });
         }
 
+        // DETERMINACIÓN ESTRICTA DEL ÚLTIMO JUGADOR EN REACCIONAR
         function touchTable() {
             if (hasTouchedTable) return;
             
@@ -602,9 +601,10 @@
                         room.reactions.push(playerId);
                     }
 
+                    // Cuando responden los 3 perdedores potenciales (los 3 ajenos al ganador)
                     if (room.reactions.length === 3) {
-                        const allPlayers = [1, 2, 3, 4];
-                        let loser = allPlayers.find(p => p !== room.winner && !room.reactions.includes(p));
+                        // El PERDEDOR es ESTRICTAMENTE el ÚLTIMO jugador en presionar el botón (el 3.º elemento de las reacciones)
+                        let loser = room.reactions[2];
                         
                         room.gameState = 'finished';
                         room.loser = loser;
