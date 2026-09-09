@@ -219,7 +219,23 @@
 
         .btn:hover { background: var(--blue-hover); }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
-        .btn-cuadricas { background: var(--green); font-size: 1.4rem; padding: 18px; display: none; }
+        
+        .btn-cuadricas { 
+            background: var(--green); 
+            font-size: 1.4rem; 
+            padding: 18px; 
+            display: none; 
+        }
+
+        /* DESHABILITACIÓN TRANSPARENTE DE BOTÓN CUÁDRICAS */
+        .btn-cuadricas:disabled {
+            background: var(--green) !important;
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            transform: scale(0.98);
+        }
         
         .btn-mesa { 
             background: #dc2626; 
@@ -228,6 +244,7 @@
             display: none; 
         }
 
+        /* DESHABILITACIÓN TRANSPARENTE DE BOTÓN MESA */
         .btn-mesa:disabled {
             background: #dc2626 !important;
             opacity: 0.35 !important;
@@ -356,6 +373,7 @@
         let myHand = [];
         let isRotating = false;
         let hasTouchedTable = false;
+        let hasClaimedWin = false; // VARIABLE DE ESTADO DE CUÁDRICAS
 
         function selectRoomNumber(num, btn) {
             roomId = num;
@@ -410,7 +428,7 @@
                     if (room) {
                         room.playersCount = Math.max(0, (room.playersCount || 1) - 1);
                         if (room.playersCount === 0) {
-                            return null; // Borrar sala si queda vacía
+                            return null;
                         }
                     }
                     return room;
@@ -588,15 +606,32 @@
             if (myHand.length === 4) {
                 const firstFamily = myHand[0].family;
                 const isCuadrica = myHand.every(c => c && c.family === firstFamily);
+                const btnCuadricas = document.getElementById('btn-cuadricas');
+
                 if (isCuadrica) {
-                    document.getElementById('btn-cuadricas').style.display = 'block';
+                    btnCuadricas.style.display = 'block';
+                    if (hasClaimedWin) {
+                        btnCuadricas.disabled = true;
+                        btnCuadricas.innerText = "¡CUÁDRICAS RECLAMADO!";
+                    } else {
+                        btnCuadricas.disabled = false;
+                        btnCuadricas.innerText = "¡CUÁDRICAS!";
+                    }
                 } else {
-                    document.getElementById('btn-cuadricas').style.display = 'none';
+                    btnCuadricas.style.display = 'none';
                 }
             }
         }
 
+        // DESHABILITACIÓN Y PROTECCIÓN DEL BOTÓN ¡CUÁDRICAS!
         function claimWin() {
+            if (hasClaimedWin) return;
+            
+            hasClaimedWin = true;
+            const btnCuadricas = document.getElementById('btn-cuadricas');
+            btnCuadricas.disabled = true;
+            btnCuadricas.innerText = "¡CUÁDRICAS RECLAMADO!";
+
             db.ref('rooms/room_' + roomId).update({
                 gameState: 'cuadricas_claimed',
                 winner: playerId,
@@ -604,6 +639,7 @@
             });
         }
 
+        // DETERMINACIÓN DE PERDEDOR INFALIBLE
         function touchTable() {
             if (hasTouchedTable) return;
             
@@ -620,9 +656,17 @@
                         room.reactions.push(playerId);
                     }
 
+                    // Cuando han tocado la mesa los 3 compañeros del ganador
                     if (room.reactions.length === 3) {
-                        let loser = room.reactions[2];
+                        const allPlayers = [1, 2, 3, 4];
+                        // El perdedor es el ÚNICO de los 4 que NO ganó Y tampoco tocó la mesa a tiempo
+                        let loser = allPlayers.find(p => p !== room.winner && !room.reactions.includes(p));
                         
+                        // Si por algún motivo extremo todos tocaron, selecciona el último en el arreglo
+                        if (!loser) {
+                            loser = room.reactions[2];
+                        }
+
                         room.gameState = 'finished';
                         room.loser = loser;
                         room.penitencia = PENITENCIAS[Math.floor(Math.random() * PENITENCIAS.length)];
