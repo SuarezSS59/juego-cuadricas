@@ -221,13 +221,14 @@
         .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
         .btn-cuadricas { background: var(--green); font-size: 1.4rem; padding: 18px; display: none; }
         
-        /* ESTILO Y EFECTO TRANSPARENTE AL PRESIONAR "PONER MANO EN LA MESA" */
         .btn-mesa { 
             background: #dc2626; 
             font-size: 1.4rem; 
             padding: 18px; 
             display: none; 
         }
+
+        /* EFECTO PERMANENTE DE BOTÓN TRANSPARENTE DESHABILITADO */
         .btn-mesa:disabled {
             background: #dc2626 !important;
             opacity: 0.35 !important;
@@ -352,6 +353,7 @@
         let selectedCardIndex = null;
         let myHand = [];
         let isRotating = false;
+        let hasTouchedTable = false; // VARIABLE DE ESTADO DE TOCADO
 
         function selectRoomNumber(num, btn) {
             roomId = num;
@@ -440,8 +442,16 @@
                     if (data.winner !== playerId) {
                         const btnMesa = document.getElementById('btn-mesa');
                         btnMesa.style.display = 'block';
-                        btnMesa.disabled = false;
-                        btnMesa.innerText = "¡PONER MANO EN LA MESA!";
+                        
+                        // MANTENER EL ESTADO DESHABILITADO SI YA TOCÓ
+                        if (hasTouchedTable) {
+                            btnMesa.disabled = true;
+                            btnMesa.innerText = "¡MANO PUESTA!";
+                        } else {
+                            btnMesa.disabled = false;
+                            btnMesa.innerText = "¡PONER MANO EN LA MESA!";
+                        }
+
                         document.getElementById('btn-cuadricas').style.display = 'none';
                         document.getElementById('btn-pass').style.display = 'none';
                     }
@@ -562,12 +572,11 @@
             });
         }
 
-        // FUNCIÓN CON DESHABILITACIÓN E OPACIDAD INMEDIATA
         function touchTable() {
-            const btnMesa = document.getElementById('btn-mesa');
-            if (btnMesa.disabled) return;
+            if (hasTouchedTable) return;
             
-            // Bloquea inmediatamente el botón
+            hasTouchedTable = true;
+            const btnMesa = document.getElementById('btn-mesa');
             btnMesa.disabled = true;
             btnMesa.innerText = "¡MANO PUESTA!";
             
