@@ -228,7 +228,6 @@
             display: none; 
         }
 
-        /* EFECTO PERMANENTE DE BOTÓN TRANSPARENTE DESHABILITADO */
         .btn-mesa:disabled {
             background: #dc2626 !important;
             opacity: 0.35 !important;
@@ -353,7 +352,7 @@
         let selectedCardIndex = null;
         let myHand = [];
         let isRotating = false;
-        let hasTouchedTable = false; // VARIABLE DE ESTADO DE TOCADO
+        let hasTouchedTable = false;
 
         function selectRoomNumber(num, btn) {
             roomId = num;
@@ -375,7 +374,7 @@
 
             roomRef.transaction((room) => {
                 if (!room) {
-                    room = { playersCount: 0, gameState: 'waiting', hands: {}, descartes: {} };
+                    room = { playersCount: 0, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
                 }
                 if (room.playersCount < 4) {
                     room.playersCount++;
@@ -443,7 +442,6 @@
                         const btnMesa = document.getElementById('btn-mesa');
                         btnMesa.style.display = 'block';
                         
-                        // MANTENER EL ESTADO DESHABILITADO SI YA TOCÓ
                         if (hasTouchedTable) {
                             btnMesa.disabled = true;
                             btnMesa.innerText = "¡MANO PUESTA!";
@@ -478,7 +476,8 @@
             db.ref('rooms/room_' + roomId).update({
                 gameState: 'playing',
                 hands: hands,
-                descartes: {}
+                descartes: {},
+                reactions: []
             });
         }
 
@@ -568,10 +567,11 @@
             db.ref('rooms/room_' + roomId).update({
                 gameState: 'cuadricas_claimed',
                 winner: playerId,
-                reactionCount: 0
+                reactions: []
             });
         }
 
+        // LÓGICA DE DETECCIÓN EXACTA DEL ÚLTIMO JUGADOR
         function touchTable() {
             if (hasTouchedTable) return;
             
@@ -582,11 +582,21 @@
             
             db.ref('rooms/room_' + roomId).transaction((room) => {
                 if (room) {
-                    room.reactionCount = (room.reactionCount || 0) + 1;
-                    if (room.reactionCount === 3) {
-                        const players = [1, 2, 3, 4];
+                    if (!room.reactions) room.reactions = [];
+                    
+                    // Solo registrar la reacción si este jugador aún no está en la lista
+                    if (!room.reactions.includes(playerId)) {
+                        room.reactions.push(playerId);
+                    }
+
+                    // Cuando 3 de los 4 jugadores han puesto la mano
+                    if (room.reactions.length === 3) {
+                        const allPlayers = [1, 2, 3, 4];
+                        
+                        // El perdedor es el ÚNICO jugador de los 4 que no está en las reacciones ni es el ganador
+                        let loser = allPlayers.find(p => p !== room.winner && !room.reactions.includes(p));
+                        
                         room.gameState = 'finished';
-                        let loser = players.find(p => p !== room.winner); 
                         room.loser = loser;
                         room.penitencia = PENITENCIAS[Math.floor(Math.random() * PENITENCIAS.length)];
                     }
