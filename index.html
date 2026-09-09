@@ -277,7 +277,7 @@
                 </ul>
             </div>
 
-            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Reiniciar esta Sala (Solo si está atascada)</button>
+            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Forzar Reinicio de esta Sala</button>
         </div>
     </div>
 
@@ -289,7 +289,8 @@
             <p style="margin:0; font-size:0.9rem; color:#1e40af;">Jugadores conectados en la mesa:</p>
             <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4</span>
         </div>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:0;">Esperando a que entren tus compañeros para repartir las cartas...</p>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">Esperando a que entren tus compañeros para repartir las cartas...</p>
+        <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.85rem;" onclick="leaveRoom()">Salir de la Sala</button>
     </div>
 
     <!-- PANTALLA 3: JUEGO EN VIVO -->
@@ -304,6 +305,8 @@
 
         <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡CUÁDRICAS!</button>
         <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡PONER MANO EN LA MESA!</button>
+        
+        <button id="btn-restart-game" class="btn" style="background:#64748b; display:none; margin-top:15px;" onclick="leaveRoom()">Volver al Lobby / Nueva Ronda</button>
     </div>
 
     <script>
@@ -362,15 +365,8 @@
         }
 
         function resetRoom() {
-            db.ref('rooms/room_' + roomId).once('value', (snap) => {
-                const room = snap.val();
-                if (room && room.gameState === 'playing') {
-                    alert(`⚠️ La sala ${roomId} tiene una partida activa de 4 jugadores. No se puede reiniciar mientras juegan.`);
-                } else {
-                    db.ref('rooms/room_' + roomId).remove();
-                    alert(`Sala ${roomId} ha sido reiniciada con éxito.`);
-                }
-            });
+            db.ref('rooms/room_' + roomId).remove();
+            alert(`Sala ${roomId} reiniciada por completo.`);
         }
 
         function joinRoom() {
@@ -397,11 +393,42 @@
                     document.getElementById('wait-player-id').innerText = playerId;
                     document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
+
+                    // CONFIGURAR DETECCIÓN DE DESCONEXIÓN AUTO-CLEANUP
+                    setupDisconnectHandler();
                     listenRoom();
                 } else {
-                    alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en una partida activa. Elige otra sala.`);
+                    alert(`⚠️ El Grupo ${roomId} ya está lleno o en juego. Elige otra sala.`);
                 }
             });
+        }
+
+        function setupDisconnectHandler() {
+            const roomRef = db.ref('rooms/room_' + roomId);
+            
+            // Si el usuario cierra el navegador o se desconecta
+            roomRef.child('playersCount').onDisconnect().transaction((count) => {
+                if (count && count > 1) {
+                    return count - 1;
+                } else {
+                    // Si era el último en la sala, borrarla por completo
+                    roomRef.onDisconnect().remove();
+                    return 0;
+                }
+            });
+        }
+
+        function leaveRoom() {
+            if (roomId && playerId) {
+                const roomRef = db.ref('rooms/room_' + roomId);
+                roomRef.child('playersCount').transaction((count) => {
+                    return (count && count > 1) ? count - 1 : 0;
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                location.reload();
+            }
         }
 
         function listenRoom() {
@@ -411,7 +438,7 @@
                 const data = snapshot.val();
                 if (!data) return;
 
-                document.getElementById('player-count').innerText = data.playersCount;
+                document.getElementById('player-count').innerText = data.playersCount || 0;
 
                 if (data.playersCount === 4 && data.gameState === 'waiting' && playerId === 1) {
                     dealCards();
@@ -450,7 +477,6 @@
                 }
 
                 if (data.gameState === 'cuadricas_claimed') {
-                    // Muestra el botón de la mesa a TODOS los que no son el ganador
                     if (data.winner !== playerId) {
                         const btnMesa = document.getElementById('btn-mesa');
                         btnMesa.style.display = 'block';
@@ -469,6 +495,8 @@
                 }
 
                 if (data.gameState === 'finished') {
+                    document.getElementById('btn-restart-game').style.display = 'block';
+                    
                     if (data.loser === playerId) {
                         alert("¡FUISTE EL ÚLTIMO EN REACCIONAR!\n\nToma una CARTA DE PENITENCIA:\n\n" + data.penitencia);
                     } else {
@@ -584,7 +612,6 @@
             });
         }
 
-        // DETERMINACIÓN ESTRICTA DEL ÚLTIMO JUGADOR EN REACCIONAR
         function touchTable() {
             if (hasTouchedTable) return;
             
@@ -601,9 +628,7 @@
                         room.reactions.push(playerId);
                     }
 
-                    // Cuando responden los 3 perdedores potenciales (los 3 ajenos al ganador)
                     if (room.reactions.length === 3) {
-                        // El PERDEDOR es ESTRICTAMENTE el ÚLTIMO jugador en presionar el botón (el 3.º elemento de las reacciones)
                         let loser = room.reactions[2];
                         
                         room.gameState = 'finished';
