@@ -44,7 +44,7 @@
         .btn { background: var(--blue); color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; transition: all 0.2s; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         .btn-start { background: var(--green); font-size: 1.2rem; margin-top: 15px; }
-        .btn-start:disabled { background: #94a3b8 !important; }
+        .btn-start:disabled { background: #94a3b8 !important; cursor: not-allowed !important; }
 
         .penalties-box { background: #fee2e2; border: 1px dashed #ef4444; border-radius: 10px; padding: 12px; margin-top: 15px; text-align: left; font-size: 0.75rem; color: #7f1d1d; }
         .penalties-box h4 { margin: 0 0 6px 0; font-size: 0.85rem; }
@@ -310,7 +310,13 @@
             const roomRef = db.ref('rooms/room_' + roomId);
             roomRef.on('value', (snapshot) => {
                 const data = snapshot.val(); 
-                if (!data) return;
+                
+                // SI LA SALA SE BORRA O SE REINICIA, SACA A TODOS AL LOBBY AUTOMÁTICAMENTE
+                if (!data) {
+                    alert("⚠️ La sala ha sido reiniciada o cerrada. Volviendo al menú principal...");
+                    location.reload();
+                    return;
+                }
                 
                 const count = data.playersCount || 1; 
                 document.getElementById('player-count').innerText = count;
@@ -379,6 +385,7 @@
             const roomRef = db.ref('rooms/room_' + roomId);
             roomRef.once('value').then(snap => {
                 const data = snap.val();
+                if (!data) return;
                 const count = data.playersCount;
                 if(count < 2) return;
 
