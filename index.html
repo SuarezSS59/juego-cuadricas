@@ -133,7 +133,7 @@
                 <b>👨‍💻 Multijugador:</b> De 2 a 4 jugadores por sala. El Jugador 1 inicia la partida.
             </div>
             
-            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="resetRoom()">🔄 Reiniciar esta Sala (Limpiar bloqueo)</button>
+            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="resetRoom()">🔄 Reiniciar esta Sala (Forzar limpieza)</button>
         </div>
     </div>
 
@@ -241,6 +241,7 @@
         document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => `<li>${p}</li>`).join('');
 
         let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false, activePlayersCount = 0;
+        let roomListener = null;
 
         function selectRoomNumber(num, btn) { 
             roomId = num; 
@@ -250,10 +251,15 @@
         }
         
         function resetRoom() { 
-            db.ref('rooms/room_' + roomId).remove().then(() => { 
-                alert(`¡La Sala ${roomId} ha sido vaciada con éxito!`); 
-                location.reload(); 
-            }); 
+            // Esto marca la sala como forzada a reiniciarse, avisando a todos con alerta y sacándolos
+            db.ref('rooms/room_' + roomId).update({ forceReset: true }).then(() => {
+                setTimeout(() => {
+                    db.ref('rooms/room_' + roomId).remove().then(() => { 
+                        alert(`¡La Sala ${roomId} ha sido vaciada con éxito!`); 
+                        location.reload(); 
+                    });
+                }, 200);
+            });
         }
         
         function joinRoom() {
@@ -263,19 +269,19 @@
             
             roomRef.transaction((room) => {
                 if (!room) {
-                    return { playersCount: 1, gameState: 'waiting', activePlayers: 0, hands: {}, descartes: {}, reactions: {}, clients: { 1: true } };
+                    return { gameState: 'waiting', playersCount: 1, clients: { 1: true }, hands: {}, descartes: {}, reactions: {} };
                 }
                 if (room.gameState !== 'waiting') return;
                 
                 let clients = room.clients || {};
-                let currentIds = Object.keys(clients).map(Number);
-                if (currentIds.length >= 4) return; // Sala llena máx 4
+                let assignedId = null;
                 
-                // Asignar el primer ID libre del 1 al 4
-                let assignedId = 1;
+                // Buscar el primer hueco disponible del 1 al 4
                 for (let i = 1; i <= 4; i++) {
                     if (!clients[i]) { assignedId = i; break; }
                 }
+                
+                if (!assignedId) return; // Sala llena
                 
                 clients[assignedId] = true;
                 room.clients = clients;
@@ -284,9 +290,9 @@
             }, (error, committed, snapshot) => {
                 if (committed && snapshot.exists()) {
                     const roomData = snapshot.val();
-                    // Buscar qué ID le tocó a este cliente específico buscando en clients o usando el último
                     let clients = roomData.clients || {};
-                    // Identificaremos el ID buscando el último conectado o asignado
+                    
+                    // Encontrar el ID que le pertenece a esta sesión buscando el último añadido o validando
                     playerId = Number(Object.keys(clients).pop());
                     
                     document.getElementById('my-player-id').innerText = playerId;
@@ -303,26 +309,10 @@
                         document.getElementById('wait-msg').style.display = 'block';
                     }
                     
-                    setupDisconnectHandler(playerId); 
                     listenRoom();
                 } else {
                     alert(`⚠️ La Sala ${roomId} está llena o en partida. Usa "Reiniciar esta Sala" para limpiarla.`);
                 }
-            });
-        }
-
-        function setupDisconnectHandler(myId) {
-            const roomRef = db.ref('rooms/room_' + roomId);
-            roomRef.child('clients/' + myId).onDisconnect().remove().then(() => {
-                // Actualizar el conteo al desconectarse
-                roomRef.transaction((room) => {
-                    if (room && room.clients) {
-                        delete room.clients[myId];
-                        room.playersCount = Object.keys(room.clients).length;
-                        if (room.playersCount === 0) return null; // Borrar sala si queda vacía
-                    }
-                    return room;
-                });
             });
         }
 
@@ -331,8 +321,9 @@
                 db.ref('rooms/room_' + roomId).transaction((room) => {
                     if (room && room.clients) {
                         delete room.clients[playerId];
-                        room.playersCount = Object.keys(room.clients).length;
-                        if (room.playersCount === 0) return null;
+                        let newCount = Object.keys(room.clients).length;
+                        room.playersCount = newCount;
+                        if (newCount === 0) return null;
                     }
                     return room;
                 }).then(() => location.reload());
@@ -346,23 +337,23 @@
             roomRef.on('value', (snapshot) => {
                 const data = snapshot.val(); 
                 
-                if (!data) {
-                    alert("⚠️ La sala ha sido reiniciada o cerrada. Volviendo al menú principal...");
+                if (!data) return;
+                
+                // SOLO si se presionó "Reiniciar Sala", la bandera forceReset saca a los jugadores con alerta
+                if (data.forceReset) {
+                    alert("⚠️ La sala ha sido reiniciada por el anfitrión. Volviendo al menú principal...");
                     location.reload();
                     return;
                 }
                 
-                // Recalcular siempre el número exacto de jugadores activos desde los clientes conectados
                 let clients = data.clients || {};
                 let count = Object.keys(clients).length;
                 document.getElementById('player-count').innerText = count;
                 
-                // Publicar automáticamente el conteo actualizado en la base de datos para todos
                 if (data.gameState === 'waiting' && data.playersCount !== count) {
-                    roomRef.child('playersCount').set(count);
+                    roomRef.update({ playersCount: count });
                 }
                 
-                // Control dinámico del botón de inicio para el Jugador 1
                 if(playerId === 1 && data.gameState === 'waiting') {
                     const btnStart = document.getElementById('btn-start-game');
                     if(count >= 2) {
