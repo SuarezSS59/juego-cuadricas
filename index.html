@@ -436,13 +436,13 @@
             });
         }
 
-        function confirmDescarte() { if (selectedCardIndex !== null) db.ref(`rooms/room_${roomId}/descartes/${playerId}`).set({ card: myHand[selectedCardIndex], fromIndex: selectedCardIndex }); }
+        function confirmDescarte() { if (selectedCardIndex !== null) db.ref('rooms/room_' + roomId + '/descartes/' + playerId).set({ card: myHand[selectedCardIndex], fromIndex: selectedCardIndex }); }
 
         function ejecutarRotacionSimultanea(currentHands, descartes, totalActive) {
             let newHands = JSON.parse(JSON.stringify(currentHands));
             for (let p = 1; p <= totalActive; p++) newHands[p].splice(descartes[p].fromIndex, 1);
             for (let p = 1; p <= totalActive; p++) newHands[(p % totalActive) + 1].push(descartes[p].card);
-            db.ref(`rooms/room_${roomId}`).update({ hands: newHands, descartes: {} }).then(() => isRotating = false);
+            db.ref('rooms/room_' + roomId).update({ hands: newHands, descartes: {} }).then(() => isRotating = false);
         }
 
         function checkCuadricas() {
@@ -458,13 +458,13 @@
         function claimWin() {
             if (hasClaimedWin) return; hasClaimedWin = true;
             document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡RECLAMADO!";
-            db.ref(`rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
+            db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
         }
 
         function touchTable() {
             if (hasTouchedTable) return; hasTouchedTable = true;
             document.getElementById('btn-mesa').disabled = true; document.getElementById('btn-mesa').innerText = "¡MANO PUESTA!";
-            db.ref(`rooms/room_' + roomId).transaction((room) => {
+            db.ref('rooms/room_' + roomId).transaction((room) => {
                 if (room) {
                     if (!room.reactions) room.reactions = [];
                     if (!room.reactions.includes(playerId)) room.reactions.push(playerId);
