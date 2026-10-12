@@ -42,8 +42,9 @@
         .btn-room-select.active { background: var(--blue); border-color: var(--blue); color: white; transform: scale(1.05); }
 
         .btn { background: var(--blue); color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; transition: all 0.2s; }
-        .btn:disabled { background: #64748b; cursor: not-allowed; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         .btn-start { background: var(--green); font-size: 1.2rem; margin-top: 15px; }
+        .btn-start:disabled { background: #94a3b8 !important; }
 
         .penalties-box { background: #fee2e2; border: 1px dashed #ef4444; border-radius: 10px; padding: 12px; margin-top: 15px; text-align: left; font-size: 0.75rem; color: #7f1d1d; }
         .penalties-box h4 { margin: 0 0 6px 0; font-size: 0.85rem; }
@@ -146,8 +147,11 @@
             <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4 max</span>
         </div>
 
-        <button id="btn-start-game" class="btn btn-start" style="display:none;" onclick="startGame()">¡Iniciar Partida!</button>
-        <p id="wait-msg" style="font-size:0.8rem; color:#64748b;">Esperando a que el Jugador 1 inicie la partida...</p>
+        <!-- CONTENEDOR DE INICIO CONDICIONAL (SOLO JUGADOR 1) -->
+        <div id="host-controls" style="display:none;">
+            <button id="btn-start-game" class="btn btn-start" onclick="startGame()" disabled>Faltan jugadores (Mín. 2)...</button>
+        </div>
+        <p id="wait-msg" style="font-size:0.8rem; color:#64748b; display:none;">Esperando a que el Jugador 1 inicie la partida...</p>
         
         <div class="penalties-box">
             <h4>⚖️ Penitencias del Tablero (Si pierdes):</h4>
@@ -223,7 +227,6 @@
             { id: 11, family: 'lhopital', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: "L'HÔPITAL", formula: 'Derivar por separado', desc: 'Numerador y denominador.', img: '' },
             { id: 12, family: 'lhopital', badge: 'VISUAL', badgeClass: 'badge-visual', title: "L'HÔPITAL", formula: 'Derivada', desc: 'Operador de derivación.', img: 'lhopital-grafica.png' },
 
-            // FAMILIA 4 ACTUALIZADA A APLICACIONES (MODELADO TÉRMICO / FÍSICO)
             { id: 13, family: 'aplicaciones', badge: 'IDENTIFICADOR', badgeClass: 'badge-problema', title: 'APLICACIONES', formula: 'Modelado Físico y Térmico', desc: 'Estudio de fenómenos en superficies.', img: '' },
             { id: 14, family: 'aplicaciones', badge: 'HERRAMIENTA', badgeClass: 'badge-metodo', title: 'APLICACIONES', formula: 'T(x,y)  o  P(x,y)', desc: 'Modelado de campos térmicos o de presión.', img: '' },
             { id: 15, family: 'aplicaciones', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: 'APLICACIONES', formula: 'Estabilidad física sin saltos', desc: 'Garantizar continuidad en el sistema.', img: '' },
@@ -273,6 +276,15 @@
                     document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
                     
+                    // Control estricto visual de roles al entrar
+                    if(playerId === 1) {
+                        document.getElementById('host-controls').style.display = 'block';
+                        document.getElementById('wait-msg').style.display = 'none';
+                    } else {
+                        document.getElementById('host-controls').style.display = 'none';
+                        document.getElementById('wait-msg').style.display = 'block';
+                    }
+                    
                     setupDisconnectHandler(); 
                     listenRoom();
                 } else {
@@ -296,14 +308,19 @@
                 const data = snapshot.val(); 
                 if (!data) return;
                 
-                const count = data.playersCount || 0; 
+                const count = data.playersCount || 1; 
                 document.getElementById('player-count').innerText = count;
                 
+                // Actualización dinámica del botón de inicio para el Jugador 1
                 if(playerId === 1) {
-                    document.getElementById('btn-start-game').style.display = 'block';
-                    document.getElementById('wait-msg').style.display = 'none';
-                    document.getElementById('btn-start-game').disabled = count < 2;
-                    document.getElementById('btn-start-game').innerText = count < 2 ? "Faltan jugadores..." : `¡Iniciar Partida (${count} Jugadores)!`;
+                    const btnStart = document.getElementById('btn-start-game');
+                    if(count >= 2) {
+                        btnStart.disabled = false;
+                        btnStart.innerText = `¡Iniciar Partida (${count} Jugadores)!`;
+                    } else {
+                        btnStart.disabled = true;
+                        btnStart.innerText = "Faltan jugadores (Mín. 2)...";
+                    }
                 }
                 
                 if (data.gameState === 'playing') {
