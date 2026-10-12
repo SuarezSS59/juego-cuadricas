@@ -263,17 +263,31 @@
             
             roomRef.transaction((room) => {
                 if (!room) {
-                    return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
+                    return { playersCount: 1, gameState: 'waiting', activePlayers: 0, hands: {}, descartes: {}, reactions: {}, clients: { 1: true } };
                 }
-                if (room.gameState !== 'waiting' || room.playersCount >= 4) {
-                    return; 
+                if (room.gameState !== 'waiting') return;
+                
+                let clients = room.clients || {};
+                let currentIds = Object.keys(clients).map(Number);
+                if (currentIds.length >= 4) return; // Sala llena máx 4
+                
+                // Asignar el primer ID libre del 1 al 4
+                let assignedId = 1;
+                for (let i = 1; i <= 4; i++) {
+                    if (!clients[i]) { assignedId = i; break; }
                 }
-                room.playersCount = (room.playersCount || 0) + 1;
+                
+                clients[assignedId] = true;
+                room.clients = clients;
+                room.playersCount = Object.keys(clients).length;
                 return room;
             }, (error, committed, snapshot) => {
                 if (committed && snapshot.exists()) {
                     const roomData = snapshot.val();
-                    playerId = roomData.playersCount; 
+                    // Buscar qué ID le tocó a este cliente específico buscando en clients o usando el último
+                    let clients = roomData.clients || {};
+                    // Identificaremos el ID buscando el último conectado o asignado
+                    playerId = Number(Object.keys(clients).pop());
                     
                     document.getElementById('my-player-id').innerText = playerId;
                     document.getElementById('wait-player-id').innerText = playerId; 
@@ -289,7 +303,7 @@
                         document.getElementById('wait-msg').style.display = 'block';
                     }
                     
-                    setupDisconnectHandler(); 
+                    setupDisconnectHandler(playerId); 
                     listenRoom();
                 } else {
                     alert(`⚠️ La Sala ${roomId} está llena o en partida. Usa "Reiniciar esta Sala" para limpiarla.`);
@@ -297,31 +311,59 @@
             });
         }
 
-        function setupDisconnectHandler() {
+        function setupDisconnectHandler(myId) {
             const roomRef = db.ref('rooms/room_' + roomId);
-            roomRef.child('playersCount').onDisconnect().transaction((count) => { 
-                return (count && count > 1) ? count - 1 : (roomRef.onDisconnect().remove(), 0); 
+            roomRef.child('clients/' + myId).onDisconnect().remove().then(() => {
+                // Actualizar el conteo al desconectarse
+                roomRef.transaction((room) => {
+                    if (room && room.clients) {
+                        delete room.clients[myId];
+                        room.playersCount = Object.keys(room.clients).length;
+                        if (room.playersCount === 0) return null; // Borrar sala si queda vacía
+                    }
+                    return room;
+                });
             });
         }
 
-        function leaveRoom() { location.reload(); }
+        function leaveRoom() { 
+            if (roomId && playerId) {
+                db.ref('rooms/room_' + roomId).transaction((room) => {
+                    if (room && room.clients) {
+                        delete room.clients[playerId];
+                        room.playersCount = Object.keys(room.clients).length;
+                        if (room.playersCount === 0) return null;
+                    }
+                    return room;
+                }).then(() => location.reload());
+            } else {
+                location.reload(); 
+            }
+        }
 
         function listenRoom() {
             const roomRef = db.ref('rooms/room_' + roomId);
             roomRef.on('value', (snapshot) => {
                 const data = snapshot.val(); 
                 
-                // SI LA SALA SE BORRA O SE REINICIA, SACA A TODOS AL LOBBY AUTOMÁTICAMENTE
                 if (!data) {
                     alert("⚠️ La sala ha sido reiniciada o cerrada. Volviendo al menú principal...");
                     location.reload();
                     return;
                 }
                 
-                const count = data.playersCount || 1; 
+                // Recalcular siempre el número exacto de jugadores activos desde los clientes conectados
+                let clients = data.clients || {};
+                let count = Object.keys(clients).length;
                 document.getElementById('player-count').innerText = count;
                 
-                if(playerId === 1) {
+                // Publicar automáticamente el conteo actualizado en la base de datos para todos
+                if (data.gameState === 'waiting' && data.playersCount !== count) {
+                    roomRef.child('playersCount').set(count);
+                }
+                
+                // Control dinámico del botón de inicio para el Jugador 1
+                if(playerId === 1 && data.gameState === 'waiting') {
                     const btnStart = document.getElementById('btn-start-game');
                     if(count >= 2) {
                         btnStart.disabled = false;
@@ -386,7 +428,8 @@
             roomRef.once('value').then(snap => {
                 const data = snap.val();
                 if (!data) return;
-                const count = data.playersCount;
+                let clients = data.clients || {};
+                let count = Object.keys(clients).length;
                 if(count < 2) return;
 
                 let families = ['trayectoria', 'polares', 'lhopital', 'aplicaciones'];
@@ -395,7 +438,10 @@
                 let shuffled = activeDeck.sort(() => Math.random() - 0.5);
 
                 let hands = {};
-                for(let i=1; i<=count; i++) hands[i] = shuffled.slice((i-1)*4, i*4);
+                let clientKeys = Object.keys(clients).map(Number).sort();
+                clientKeys.forEach((key, index) => {
+                    hands[key] = shuffled.slice(index * 4, (index + 1) * 4);
+                });
 
                 roomRef.update({ gameState: 'playing', activePlayers: count, hands: hands, descartes: {}, reactions: [] });
             });
