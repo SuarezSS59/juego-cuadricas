@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuádricas para Cálculo Multivariable</title>
+    <title>Match Multivariable - Corte 2</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
@@ -28,7 +28,7 @@
         }
 
         .app-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
             color: white;
             padding: 16px 20px;
             border-radius: 16px;
@@ -37,222 +37,67 @@
             box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
         }
 
-        .app-header h1 {
-            margin: 0;
-            font-size: 1.6rem;
-            letter-spacing: 1px;
-            font-weight: 900;
-        }
-
-        .app-header p {
-            margin: 4px 0 0 0;
-            font-size: 0.8rem;
-            opacity: 0.85;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
+        .app-header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; font-weight: 900; }
+        .app-header p { margin: 4px 0 0 0; font-size: 0.8rem; opacity: 0.85; font-weight: 600; }
 
         .lobby-card {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            max-width: 480px;
-            margin: 0 auto;
-            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
-            box-sizing: border-box;
+            background: white; padding: 24px; border-radius: 16px; max-width: 480px;
+            margin: 0 auto; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
         }
 
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin: 16px 0;
-        }
-
+        .rooms-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0; }
         .btn-room-select {
-            background: #f1f5f9;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 10px 0;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--slate);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 0;
+            font-weight: 800; font-size: 1.1rem; color: var(--slate); cursor: pointer; transition: all 0.2s ease;
         }
-
-        .btn-room-select.active {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
-        }
+        .btn-room-select.active { background: var(--blue); border-color: var(--blue); color: white; transform: scale(1.05); }
 
         .rules-box {
-            background: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: left;
-            margin: 16px 0;
-            font-size: 0.78rem;
-            color: #475569;
-            line-height: 1.4;
+            background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px;
+            text-align: left; margin: 16px 0; font-size: 0.78rem; color: #475569; line-height: 1.4;
         }
 
-        .rules-box b { color: var(--slate); }
-
-        .card-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
+        .card-container { display: flex; flex-direction: column; gap: 10px; align-items: center; max-width: 500px; margin: 0 auto; }
         .card {
-            background: white;
-            border: 2px solid #94a3b8;
-            border-radius: 12px;
-            padding: 12px;
-            width: 95%;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-            cursor: pointer;
-            transition: transform 0.15s, border-color 0.15s;
-            user-select: none;
-            box-sizing: border-box;
+            background: white; border: 2px solid #94a3b8; border-radius: 12px; padding: 12px; width: 95%;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: row; align-items: center;
+            gap: 12px; text-align: left; cursor: pointer; transition: transform 0.15s, border-color 0.15s; box-sizing: border-box;
         }
-
-        .card.selected {
-            border: 3px solid var(--blue);
-            background: #eff6ff;
-            transform: scale(1.02);
-        }
+        .card.selected { border: 3px solid var(--blue); background: #eff6ff; transform: scale(1.02); }
 
         .card-media {
-            width: 95px;
-            min-width: 95px;
-            height: 95px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-sizing: border-box;
+            width: 95px; min-width: 95px; height: 95px; background: #ffffff; border: 1px solid #e2e8f0;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
+        .card-media img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; }
 
-        .card-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 6px;
-        }
-
-        .card-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-header { font-size: 0.6rem; font-weight: 800; color: #64748b; letter-spacing: 0.5px; }
-
+        .card-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-header { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
         .card-badge {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin: 2px 0;
-            text-transform: uppercase;
-            width: fit-content;
+            font-size: 0.65rem; font-weight: 800; color: white; padding: 2px 6px; border-radius: 4px;
+            display: inline-block; margin: 2px 0; text-transform: uppercase; width: fit-content;
         }
-
+        .badge-problema { background-color: var(--orange); }
+        .badge-metodo { background-color: var(--slate); }
         .badge-visual { background-color: var(--blue); }
-        .badge-ecuacion { background-color: var(--orange); }
-        .badge-objeto { background-color: var(--green); }
-        .badge-dominio { background-color: var(--slate); }
+        .badge-conclusion { background-color: var(--green); }
 
         .card-title { font-size: 0.85rem; font-weight: 900; color: #1e293b; }
-
-        .card-formula {
-            font-size: 0.9rem;
-            font-weight: 800;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 4px 6px;
-            border-radius: 4px;
-            margin: 4px 0;
-            color: #0f172a;
-            text-align: center;
-        }
-
+        .card-formula { background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 6px; border-radius: 4px; margin: 4px 0; font-size: 0.9rem; font-weight: 800; text-align: center; }
         .card-desc { font-size: 0.75rem; color: #475569; line-height: 1.2; }
         .card-footer { font-size: 0.55rem; font-weight: 700; color: #94a3b8; text-align: right; margin-top: 4px; }
 
         .btn {
-            background: var(--blue);
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            max-width: 500px;
-            margin: 10px auto;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            transition: all 0.2s ease;
+            background: var(--blue); color: white; border: none; padding: 14px 20px; border-radius: 10px;
+            font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; max-width: 500px; margin: 10px auto;
         }
-
-        .btn:hover { background: var(--blue-hover); }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         
-        .btn-cuadricas { 
-            background: var(--green); 
-            font-size: 1.4rem; 
-            padding: 18px; 
-            display: none; 
-        }
-
-        /* DESHABILITACIÓN TRANSPARENTE DE BOTÓN CUÁDRICAS */
-        .btn-cuadricas:disabled {
-            background: var(--green) !important;
-            opacity: 0.35 !important;
-            cursor: not-allowed !important;
-            pointer-events: none !important;
-            box-shadow: none !important;
-            transform: scale(0.98);
-        }
+        .btn-cuadricas { background: var(--green); font-size: 1.4rem; padding: 18px; display: none; }
+        .btn-cuadricas:disabled { opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; }
         
-        .btn-mesa { 
-            background: #dc2626; 
-            font-size: 1.4rem; 
-            padding: 18px; 
-            display: none; 
-        }
-
-        /* DESHABILITACIÓN TRANSPARENTE DE BOTÓN MESA */
-        .btn-mesa:disabled {
-            background: #dc2626 !important;
-            opacity: 0.35 !important;
-            cursor: not-allowed !important;
-            pointer-events: none !important;
-            box-shadow: none !important;
-            transform: scale(0.98);
-        }
+        .btn-mesa { background: #dc2626; font-size: 1.4rem; padding: 18px; display: none; }
+        .btn-mesa:disabled { opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; }
     </style>
 </head>
 <body>
@@ -261,15 +106,14 @@
         <svg style="width:36px; height:36px; fill:none; stroke:white; stroke-width:2; margin-bottom:4px;" viewBox="0 0 24 24">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
-        <h1>CUÁDRICAS</h1>
-        <p>JUEGO INTERACTIVO | CÁLCULO MULTIVARIABLE</p>
+        <h1>MATCH CÁLCULO</h1>
+        <p>CORTE 2 | LÍMITES Y APLICACIONES</p>
     </div>
 
     <!-- PANTALLA 1: LOBBY -->
     <div id="screen-lobby">
         <div class="lobby-card">
-            <h3 style="margin-top:0; font-size:1.1rem; color:#1e293b;">Selecciona tu Grupo de Juego</h3>
-            
+            <h3 style="margin-top:0; color:#1e293b;">Selecciona tu Grupo de Juego</h3>
             <div class="rooms-grid">
                 <button class="btn-room-select active" onclick="selectRoomNumber(1, this)">1</button>
                 <button class="btn-room-select" onclick="selectRoomNumber(2, this)">2</button>
@@ -282,47 +126,40 @@
                 <button class="btn-room-select" onclick="selectRoomNumber(9, this)">9</button>
                 <button class="btn-room-select" onclick="selectRoomNumber(10, this)">10</button>
             </div>
-
             <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
-
             <div class="rules-box">
                 <b>📌 Reglas Rápidas:</b>
                 <ul style="margin: 6px 0 0 0; padding-left: 16px;">
-                    <li>Reúne a los <b>4 integrantes</b> en el mismo grupo.</li>
+                    <li>Reúne a los <b>4 integrantes</b> en el grupo.</li>
                     <li>Selecciona y <b>descarta 1 carta</b> por turno simultáneo.</li>
-                    <li>¡Junta el <b>cuarteto completo</b> de una figura para gritar <b>¡CUÁDRICAS!</b></li>
+                    <li>¡Junta el <b>cuarteto completo</b> de un tema para gritar <b>¡MATCH!</b></li>
                 </ul>
             </div>
-
             <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Reiniciar esta Sala</button>
         </div>
     </div>
 
-    <!-- PANTALLA 2: SALA DE ESPERA -->
+    <!-- PANTALLA 2: ESPERA -->
     <div id="screen-waiting" style="display:none;" class="lobby-card">
         <h3 style="margin-top:0;">GRUPO <span id="room-num"></span></h3>
-        <p style="font-size:1.1rem;">Eres el <b style="color:var(--blue);">Jugador <span id="wait-player-id"></span></b></p>
+        <p>Eres el <b style="color:var(--blue);">Jugador <span id="wait-player-id"></span></b></p>
         <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:10px; margin:15px 0;">
-            <p style="margin:0; font-size:0.9rem; color:#1e40af;">Jugadores conectados en la mesa:</p>
+            <p style="margin:0; font-size:0.9rem; color:#1e40af;">Jugadores en la mesa:</p>
             <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4</span>
         </div>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">Esperando a que entren tus compañeros para repartir las cartas...</p>
+        <p style="font-size:0.8rem; color:#64748b;">Esperando compañeros...</p>
         <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.85rem;" onclick="leaveRoom()">Salir de la Sala</button>
     </div>
 
-    <!-- PANTALLA 3: JUEGO EN VIVO -->
+    <!-- PANTALLA 3: JUEGO -->
     <div id="screen-game" style="display:none;">
-        <div style="background:white; padding:10px; border-radius:10px; font-weight:700; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
+        <div style="background:white; padding:10px; border-radius:10px; font-weight:700; margin-bottom:12px; border:1px solid #e2e8f0;">
             GRUPO <span id="display-room-num"></span> | Eres el <span style="color:var(--blue);">Jugador <span id="my-player-id"></span></span>
         </div>
-
         <button class="btn" id="btn-pass" onclick="confirmDescarte()" disabled>Selecciona 1 carta para descartar</button>
-
         <div id="my-hand" class="card-container"></div>
-
-        <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡CUÁDRICAS!</button>
+        <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH CÁLCULO!</button>
         <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡PONER MANO EN LA MESA!</button>
-        
         <button id="btn-restart-game" class="btn" style="background:#64748b; display:none; margin-top:15px;" onclick="leaveRoom()">Volver al Lobby / Nueva Ronda</button>
     </div>
 
@@ -339,337 +176,499 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // MAZO DE CARTAS CORTE 2
         const deckMaster = [
-            { id: 1, family: 'elipsoide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'ELIPSOIDE', formula: 'Gráfica 3D', desc: 'Superficie tridimensional cerrada y acotada en los tres ejes coordinados.', footer: 'GRÁFICA 3D', img: 'elipsoide-3d.png' },
-            { id: 2, family: 'elipsoide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'ELIPSOIDE', formula: 'x²/9 + y²/16 + z²/4 = 1', desc: 'Ecuación canónica reducida de la superficie elíptica.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 3, family: 'elipsoide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'ELIPSOIDE', formula: '4x² + 4y² + z² = 100', desc: 'Depósito industrial de gas de la forma 4x² + 4y² + z² = 100.', footer: 'APLICACIÓN COTIDIANA', img: 'elipsoide-objeto.png' },
-            { id: 4, family: 'elipsoide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'ELIPSOIDE', formula: 'Dom: {-3≤x≤3, -4≤y≤4}', desc: 'Región elíptica cerrada en el plano xy. Al cortar con x=2 genera traza elíptica.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            { id: 1, family: 'trayectoria', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'TRAYECTORIAS', formula: 'Límite (x,y)→(0,0) xy/(x²+y²)', desc: 'Evaluar el límite multivariable acercándose al origen por distintos caminos.', footer: 'LÍMITES', img: '' },
+            { id: 2, family: 'trayectoria', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'TRAYECTORIAS', formula: 'Caminos: y = mx, y = x²', desc: 'Aproximación por diferentes trayectorias para verificar si el límite arroja el mismo valor.', footer: 'MÉTODO DE TRAYECTORIA', img: '' },
+            { id: 3, family: 'trayectoria', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'TRAYECTORIAS', formula: 'Gráfica de Caminos', desc: 'La superficie muestra distintos niveles de altura al acercarse a (0,0).', footer: 'GRÁFICA 3D', img: 'trayectoria-3d.png' },
+            { id: 4, family: 'trayectoria', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'TRAYECTORIAS', formula: 'El límite NO EXISTE', desc: 'Como los diferentes caminos (ej. m=1 y m=2) arrojan resultados distintos, no hay límite.', footer: 'RESULTADO FINAL', img: '' },
 
-            { id: 5, family: 'paraboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE', formula: 'Vértice V(1,1,-1)', desc: 'Superficie en forma de copa con vértice desplazado.', footer: 'GRÁFICA 3D', img: 'paraboloide-3d.png' },
-            { id: 6, family: 'paraboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE', formula: 'y-1 = 2(x-1)² + 2(z+1)²', desc: 'Ecuación canónica reducida de 2x² + 2z² - 4x - y + 4z + 5 = 0.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 7, family: 'paraboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE', formula: 'Antena Parabólica', desc: 'Antena parabólica receptora utilizada para concentración de señales.', footer: 'APLICACIÓN COTIDIANA', img: 'paraboloide-objeto.png' },
-            { id: 8, family: 'paraboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE', formula: 'Dom: ℝ²', desc: 'Definida para todo punto (x,z) en ℝ². Posee punto mínimo en V(1,1,-1).', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            { id: 5, family: 'lhopital', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'INDETERMINACIÓN', formula: 'Formas 0/0 ó ∞/∞', desc: 'Límite que presenta una forma matemática indeterminada al evaluar directamente.', footer: 'LÍMITES', img: '' },
+            { id: 6, family: 'lhopital', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'INDETERMINACIÓN', formula: "Regla de L'Hôpital", desc: 'Derivar el numerador y el denominador de forma independiente respecto a la variable.', footer: 'REGLA DE DERIVACIÓN', img: '' },
+            { id: 7, family: 'lhopital', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'INDETERMINACIÓN', formula: 'Continuidad Reparada', desc: 'Gráfica mostrando cómo la función se aproxima a un punto específico y definido.', footer: 'GRÁFICA 3D', img: 'lhopital-grafica.png' },
+            { id: 8, family: 'lhopital', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'INDETERMINACIÓN', formula: 'Límite Definido (Ej: L = 1/2)', desc: 'Tras aplicar la derivada y evaluar, se obtiene un valor numérico real.', footer: 'RESULTADO FINAL', img: '' },
 
-            { id: 9, family: 'silla', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Punto Silla (0,0,0)', desc: 'Visualización 3D con punto de silla crítico en el origen (0,0,0).', footer: 'GRÁFICA 3D', img: 'silla-3d.png' },
-            { id: 10, family: 'silla', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'z = y² - 4x²', desc: 'Superficie en forma de silla de montar con trazas hiperbólicas.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 11, family: 'silla', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Papa Pringles / Cubierta', desc: 'Snack de papa o cubierta arquitectónica de doble curvatura.', footer: 'APLICACIÓN COTIDIANA', img: 'silla-objeto.png' },
-            { id: 12, family: 'silla', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'PARABOLOIDE HIPERBÓLICO', formula: 'Dom: ℝ²', desc: 'Cortes con z=4 y z=-4 forman hipérbolas. El plano z=0 forma dos rectas.', footer: 'CÁLCULO MULTIVARIABLE', img: '' },
+            { id: 9, family: 'polares', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'LÍMITE POLAR', formula: '√(x² + y²)', desc: 'Problema difícil de resolver algebraicamente en el sistema de coordenadas cartesianas.', footer: 'LÍMITES', img: '' },
+            { id: 10, family: 'polares', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'LÍMITE POLAR', formula: 'x=r cos(θ), y=r sin(θ)', desc: 'Sustitución polar analizando qué ocurre cuando el radio (r) tiende a cero.', footer: 'CAMBIO DE VARIABLE', img: '' },
+            { id: 11, family: 'polares', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'LÍMITE POLAR', formula: 'Acercamiento Radial', desc: 'Visualización del límite colapsando por el radio r hacia el origen sin importar el ángulo.', footer: 'GRÁFICA 3D', img: 'polares-grafica.png' },
+            { id: 12, family: 'polares', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'LÍMITE POLAR', formula: 'Independiente de θ', desc: 'El límite da el mismo valor sin depender del ángulo de acercamiento. ¡Existe!', footer: 'RESULTADO FINAL', img: '' },
 
-            { id: 13, family: 'hiperboloide', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Hoja Sup. z ≥ 5', desc: 'Visualización de la hoja superior para z ≥ 5 m.', footer: 'GRÁFICA 3D', img: 'hiperboloide-3d.png' },
-            { id: 14, family: 'hiperboloide', badge: 'ECUACIÓN', badgeClass: 'badge-ecuacion', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'z² - x² - y² = 25 (z≥5)', desc: 'Hoja superior de un hiperboloide con altura inicial z = 5 m.', footer: 'ECUACIÓN CANÓNICA', img: '' },
-            { id: 15, family: 'hiperboloide', badge: 'OBJETO REAL', badgeClass: 'badge-objeto', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Faro Acústico Industrial', desc: 'Estructura de ingeniería de un faro acústico industrial.', footer: 'APLICACIÓN COTIDIANA', img: 'hiperboloide-objeto.png' },
-            { id: 16, family: 'hiperboloide', badge: 'DOMINIO', badgeClass: 'badge-dominio', title: 'HIPERBOLOIDE 2 HOJAS', formula: 'Radio r = 12m (z=13m)', desc: 'Corte horizontal a z=13 m genera sección circular de radio 12 m.', footer: 'CÁLCULO MULTIVARIABLE', img: '' }
+            { id: 13, family: 'aplicacion', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'OPTIMIZACIÓN', formula: 'Max/Min Volumen', desc: 'Problema aplicado para encontrar dimensiones ideales sujetas a una restricción.', footer: 'APLICACIONES', img: '' },
+            { id: 14, family: 'aplicacion', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'OPTIMIZACIÓN', formula: '∇f = λ∇g (Lagrange)', desc: 'Cálculo de gradientes y uso de Multiplicadores de Lagrange o igualación a cero.', footer: 'MULTIPLICADORES', img: '' },
+            { id: 15, family: 'aplicacion', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'OPTIMIZACIÓN', formula: 'Punto Máximo (Pico)', desc: 'Superficie en 3D o mapa de contornos donde se resalta el punto más alto de la función.', footer: 'GRÁFICA 3D', img: 'optimizacion-3d.png' },
+            { id: 16, family: 'aplicacion', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'OPTIMIZACIÓN', formula: 'V_max = 50 u³', desc: 'Las coordenadas del punto crítico representan la solución óptima del problema aplicado.', footer: 'RESULTADO FINAL', img: '' }
         ];
 
         const PENITENCIAS = [
-            "Resuelve en el tablero: Halla el Dominio y Rango de z = √(16 - x² - y²). Dibújalo en 3D.",
-            "Resuelve en el tablero: Determina las trazas del plano z = 2 en y - 1 = 2(x-1)² + 2(z+1)².",
-            "Resuelve en el tablero: Grafica z = y² - 4x² e identifica la orientación de sus parábolas."
+            "Resuelve en el tablero: Demuestra mediante trayectorias que el límite de xy/(x²+y²) no existe.",
+            "Resuelve en el tablero: Escribe las fórmulas de conversión de coordenadas rectangulares a polares.",
+            "Resuelve en el tablero: Explica rápidamente para qué sirven los Multiplicadores de Lagrange."
         ];
 
-        let roomId = 1;
-        let playerId = null;
-        let selectedCardIndex = null;
-        let myHand = [];
-        let isRotating = false;
-        let hasTouchedTable = false;
-        let hasClaimedWin = false; // VARIABLE DE ESTADO DE CUÁDRICAS
+        let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false;
 
-        function selectRoomNumber(num, btn) {
-            roomId = num;
-            document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('selected-room-lbl').innerText = num;
-        }
-
-        function resetRoom() {
-            db.ref('rooms/room_' + roomId).remove().then(() => {
-                alert(`Sala ${roomId} ha sido reiniciada con éxito.`);
-                location.reload();
-            });
-        }
-
+        function selectRoomNumber(num, btn) { roomId = num; document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('selected-room-lbl').innerText = num; }
+        function resetRoom() { db.ref('rooms/room_' + roomId).remove().then(() => { alert(`Sala ${roomId} ha sido reiniciada con éxito.`); location.reload(); }); }
+        
         function joinRoom() {
-            document.getElementById('room-num').innerText = roomId;
-            document.getElementById('display-room-num').innerText = roomId;
-            
+            document.getElementById('room-num').innerText = roomId; document.getElementById('display-room-num').innerText = roomId;
             const roomRef = db.ref('rooms/room_' + roomId);
-
             roomRef.transaction((room) => {
-                if (!room) {
-                    return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
-                }
-                
-                if (room.gameState === 'playing' || room.gameState === 'cuadricas_claimed' || room.playersCount >= 4) {
-                    return; 
-                }
-
-                room.playersCount = (room.playersCount || 0) + 1;
-                return room;
+                if (!room) return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
+                if (room.gameState === 'playing' || room.gameState === 'cuadricas_claimed' || room.playersCount >= 4) return; 
+                room.playersCount = (room.playersCount || 0) + 1; return room;
             }, (error, committed, snapshot) => {
                 if (committed && snapshot.exists()) {
-                    playerId = snapshot.val().playersCount;
-                    document.getElementById('my-player-id').innerText = playerId;
-                    document.getElementById('wait-player-id').innerText = playerId;
-                    document.getElementById('screen-lobby').style.display = 'none';
+                    playerId = snapshot.val().playersCount; document.getElementById('my-player-id').innerText = playerId;
+                    document.getElementById('wait-player-id').innerText = playerId; document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
-
-                    listenRoom();
-                } else {
-                    alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en juego. Selecciona otra sala o utiliza "Reiniciar esta Sala".`);
-                }
+                    setupDisconnectHandler(); listenRoom();
+                } else alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en juego.`);
             });
+        }
+
+        function setupDisconnectHandler() {
+            const roomRef = db.ref('rooms/room_' + roomId);
+            roomRef.child('playersCount').onDisconnect().transaction((count) => { return (count && count > 1) ? count - 1 : (roomRef.onDisconnect().remove(), 0); });
         }
 
         function leaveRoom() {
             if (roomId && playerId) {
-                const roomRef = db.ref('rooms/room_' + roomId);
-                roomRef.transaction((room) => {
-                    if (room) {
-                        room.playersCount = Math.max(0, (room.playersCount || 1) - 1);
-                        if (room.playersCount === 0) {
-                            return null;
-                        }
-                    }
+                db.ref('rooms/room_' + roomId).transaction((room) => {
+                    if (room) { room.playersCount = Math.max(0, (room.playersCount || 1) - 1); if (room.playersCount === 0) return null; }
                     return room;
-                }).then(() => {
-                    location.reload();
-                });
-            } else {
-                location.reload();
-            }
+                }).then(() => location.reload());
+            } else location.reload();
         }
 
         function listenRoom() {
             const roomRef = db.ref('rooms/room_' + roomId);
-            
             roomRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (!data) return;
-
-                const count = data.playersCount || 0;
-                document.getElementById('player-count').innerText = count;
-
-                if (count === 4 && data.gameState === 'waiting' && playerId === 1) {
-                    dealCards();
-                }
-
+                const data = snapshot.val(); if (!data) return;
+                const count = data.playersCount || 0; document.getElementById('player-count').innerText = count;
+                if (count === 4 && data.gameState === 'waiting' && playerId === 1) dealCards();
+                
                 if (data.gameState === 'playing') {
-                    document.getElementById('screen-waiting').style.display = 'none';
-                    document.getElementById('screen-game').style.display = 'block';
-                    
-                    if (data.hands && data.hands[playerId]) {
-                        myHand = data.hands[playerId];
-                        renderHand();
-                        checkCuadricas();
-                    }
-
+                    document.getElementById('screen-waiting').style.display = 'none'; document.getElementById('screen-game').style.display = 'block';
+                    if (data.hands && data.hands[playerId]) { myHand = data.hands[playerId]; renderHand(); checkCuadricas(); }
                     const descartesCount = data.descartes ? Object.keys(data.descartes).length : 0;
                     const btnPass = document.getElementById('btn-pass');
-
                     if (data.descartes && data.descartes[playerId]) {
-                        btnPass.disabled = true;
-                        btnPass.innerText = `Carta confirmada. Esperando al resto... (${descartesCount}/4)`;
+                        btnPass.disabled = true; btnPass.innerText = `Carta confirmada. Esperando al resto... (${descartesCount}/4)`;
                     } else {
-                        if (selectedCardIndex === null) {
-                            btnPass.disabled = true;
-                            btnPass.innerText = "Selecciona 1 carta para descartar";
-                        } else {
-                            btnPass.disabled = false;
-                            btnPass.innerText = `Confirmar Descarte (${descartesCount}/4 listos)`;
-                        }
+                        btnPass.disabled = selectedCardIndex === null; btnPass.innerText = selectedCardIndex === null ? "Selecciona 1 carta para descartar" : `Confirmar Descarte (${descartesCount}/4 listos)`;
                     }
-
-                    if (descartesCount === 4 && !isRotating) {
-                        isRotating = true;
-                        ejecutarRotacionSimultanea(data.hands, data.descartes);
-                    }
+                    if (descartesCount === 4 && !isRotating) { isRotating = true; ejecutarRotacionSimultanea(data.hands, data.descartes); }
                 }
 
                 if (data.gameState === 'cuadricas_claimed') {
                     if (data.winner !== playerId) {
-                        const btnMesa = document.getElementById('btn-mesa');
-                        btnMesa.style.display = 'block';
-                        
-                        if (hasTouchedTable) {
-                            btnMesa.disabled = true;
-                            btnMesa.innerText = "¡MANO PUESTA!";
-                        } else {
-                            btnMesa.disabled = false;
-                            btnMesa.innerText = "¡PONER MANO EN LA MESA!";
-                        }
-
-                        document.getElementById('btn-cuadricas').style.display = 'none';
-                        document.getElementById('btn-pass').style.display = 'none';
+                        const btnMesa = document.getElementById('btn-mesa'); btnMesa.style.display = 'block';
+                        btnMesa.disabled = hasTouchedTable; btnMesa.innerText = hasTouchedTable ? "¡MANO PUESTA!" : "¡PONER MANO EN LA MESA!";
+                        document.getElementById('btn-cuadricas').style.display = 'none'; document.getElementById('btn-pass').style.display = 'none';
                     }
                 }
 
                 if (data.gameState === 'finished') {
                     document.getElementById('btn-restart-game').style.display = 'block';
-                    
-                    if (data.loser === playerId) {
-                        alert("¡FUISTE EL ÚLTIMO EN REACCIONAR!\n\nToma una CARTA DE PENITENCIA:\n\n" + data.penitencia);
-                    } else {
-                        alert(`Ronda terminada. El Jugador ${data.loser} quedó de último y debe resolver la penitencia en el tablero.`);
-                    }
+                    if (data.loser === playerId) alert("¡FUISTE EL ÚLTIMO EN REACCIONAR!\n\nToma una CARTA DE PENITENCIA:\n\n" + data.penitencia);
+                    else alert(`Ronda terminada. El Jugador ${data.loser} quedó de último y debe resolver la penitencia en el tablero.`);
                 }
             });
         }
 
         function dealCards() {
             let shuffled = [...deckMaster].sort(() => Math.random() - 0.5);
-            let hands = {
-                1: shuffled.slice(0, 4),
-                2: shuffled.slice(4, 8),
-                3: shuffled.slice(8, 12),
-                4: shuffled.slice(12, 16)
-            };
-            db.ref('rooms/room_' + roomId).update({
-                gameState: 'playing',
-                hands: hands,
-                descartes: {},
-                reactions: []
-            });
+            db.ref('rooms/room_' + roomId).update({ gameState: 'playing', hands: { 1: shuffled.slice(0, 4), 2: shuffled.slice(4, 8), 3: shuffled.slice(8, 12), 4: shuffled.slice(12, 16) }, descartes: {}, reactions: [] });
         }
 
         function renderHand() {
-            const container = document.getElementById('my-hand');
-            container.innerHTML = '';
+            const container = document.getElementById('my-hand'); container.innerHTML = '';
             myHand.forEach((card, index) => {
                 if (!card) return;
-                const cardEl = document.createElement('div');
-                cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
-                
+                const cardEl = document.createElement('div'); cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
                 let mediaHTML = card.img ? `<div class="card-media"><img src="${card.img}" alt="Media"></div>` : '';
-
-                cardEl.innerHTML = `
-                    ${mediaHTML}
-                    <div class="card-content">
-                        <div class="card-header">CUÁDRICAS</div>
-                        <span class="card-badge ${card.badgeClass}">${card.badge}</span>
-                        <div class="card-title">${card.title}</div>
-                        <div class="card-formula">${card.formula}</div>
-                        <div class="card-desc">${card.desc}</div>
-                        <div class="card-footer">${card.footer}</div>
-                    </div>
-                `;
-
-                cardEl.onclick = () => {
-                    selectedCardIndex = index;
-                    renderHand();
-                    const btnPass = document.getElementById('btn-pass');
-                    btnPass.disabled = false;
-                    btnPass.innerText = "Confirmar Descarte";
-                };
+                cardEl.innerHTML = `${mediaHTML}<div class="card-content"><div class="card-header">CORTE 2</div><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div><div class="card-footer">${card.footer}</div></div>`;
+                cardEl.onclick = () => { selectedCardIndex = index; renderHand(); document.getElementById('btn-pass').disabled = false; document.getElementById('btn-pass').innerText = "Confirmar Descarte"; };
                 container.appendChild(cardEl);
             });
         }
 
-        function confirmDescarte() {
-            if (selectedCardIndex === null) return;
-
-            const cardToPass = myHand[selectedCardIndex];
-            
-            db.ref(`rooms/room_${roomId}/descartes/${playerId}`).set({
-                card: cardToPass,
-                fromIndex: selectedCardIndex
-            });
-        }
+        function confirmDescarte() { if (selectedCardIndex !== null) db.ref(`rooms/room_${roomId}/descartes/${playerId}`).set({ card: myHand[selectedCardIndex], fromIndex: selectedCardIndex }); }
 
         function ejecutarRotacionSimultanea(currentHands, descartes) {
-            if (playerId !== 1) {
-                isRotating = false;
-                return; 
-            }
-
+            if (playerId !== 1) { isRotating = false; return; }
             let newHands = JSON.parse(JSON.stringify(currentHands));
-
-            for (let p = 1; p <= 4; p++) {
-                const idx = descartes[p].fromIndex;
-                newHands[p].splice(idx, 1);
-            }
-
-            for (let p = 1; p <= 4; p++) {
-                const nextPlayer = (p % 4) + 1;
-                newHands[nextPlayer].push(descartes[p].card);
-            }
-
-            db.ref(`rooms/room_${roomId}`).update({
-                hands: newHands,
-                descartes: {}
-            }).then(() => {
-                isRotating = false;
-            });
+            for (let p = 1; p <= 4; p++) newHands[p].splice(descartes[p].fromIndex, 1);
+            for (let p = 1; p <= 4; p++) newHands[(p % 4) + 1].push(descartes[p].card);
+            db.ref(`rooms/room_${roomId}`).update({ hands: newHands, descartes: {} }).then(() => isRotating = false);
         }
 
         function checkCuadricas() {
             if (myHand.length === 4) {
-                const firstFamily = myHand[0].family;
-                const isCuadrica = myHand.every(c => c && c.family === firstFamily);
+                const isMatch = myHand.every(c => c && c.family === myHand[0].family);
                 const btnCuadricas = document.getElementById('btn-cuadricas');
-
-                if (isCuadrica) {
-                    btnCuadricas.style.display = 'block';
-                    if (hasClaimedWin) {
-                        btnCuadricas.disabled = true;
-                        btnCuadricas.innerText = "¡CUÁDRICAS RECLAMADO!";
-                    } else {
-                        btnCuadricas.disabled = false;
-                        btnCuadricas.innerText = "¡CUÁDRICAS!";
-                    }
-                } else {
-                    btnCuadricas.style.display = 'none';
-                }
+                if (isMatch) {
+                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡MATCH RECLAMADO!" : "¡MATCH CÁLCULO!";
+                } else btnCuadricas.style.display = 'none';
             }
         }
 
-        // DESHABILITACIÓN Y PROTECCIÓN DEL BOTÓN ¡CUÁDRICAS!
         function claimWin() {
-            if (hasClaimedWin) return;
-            
-            hasClaimedWin = true;
-            const btnCuadricas = document.getElementById('btn-cuadricas');
-            btnCuadricas.disabled = true;
-            btnCuadricas.innerText = "¡CUÁDRICAS RECLAMADO!";
-
-            db.ref('rooms/room_' + roomId).update({
-                gameState: 'cuadricas_claimed',
-                winner: playerId,
-                reactions: []
-            });
+            if (hasClaimedWin) return; hasClaimedWin = true;
+            document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡MATCH RECLAMADO!";
+            db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
         }
 
-        // DETERMINACIÓN DE PERDEDOR INFALIBLE
         function touchTable() {
-            if (hasTouchedTable) return;
-            
-            hasTouchedTable = true;
-            const btnMesa = document.getElementById('btn-mesa');
-            btnMesa.disabled = true;
-            btnMesa.innerText = "¡MANO PUESTA!";
-            
+            if (hasTouchedTable) return; hasTouchedTable = true;
+            document.getElementById('btn-mesa').disabled = true; document.getElementById('btn-mesa').innerText = "¡MANO PUESTA!";
             db.ref('rooms/room_' + roomId).transaction((room) => {
                 if (room) {
                     if (!room.reactions) room.reactions = [];
-                    
-                    if (!room.reactions.includes(playerId)) {
-                        room.reactions.push(playerId);
-                    }
-
-                    // Cuando han tocado la mesa los 3 compañeros del ganador
+                    if (!room.reactions.includes(playerId)) room.reactions.push(playerId);
                     if (room.reactions.length === 3) {
-                        const allPlayers = [1, 2, 3, 4];
-                        // El perdedor es el ÚNICO de los 4 que NO ganó Y tampoco tocó la mesa a tiempo
-                        let loser = allPlayers.find(p => p !== room.winner && !room.reactions.includes(p));
-                        
-                        // Si por algún motivo extremo todos tocaron, selecciona el último en el arreglo
-                        if (!loser) {
-                            loser = room.reactions[2];
-                        }
+                        let loser = [1, 2, 3, 4].find(p => p !== room.winner && !room.reactions.includes(p)) || room.reactions[2];
+                        room.gameState = 'finished'; room.loser = loser; room.penitencia = PENITENCIAS[Math.floor(Math.random() * PENITENCIAS.length)];
+                    }
+                }
+                return room;
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Multivariable - Corte 2</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        :root {
+            --blue: #1e40af;
+            --blue-hover: #1d4ed8;
+            --orange: #c2410c;
+            --green: #15803d;
+            --slate: #334155;
+            --bg: #f8fafc;
+        }
 
-                        room.gameState = 'finished';
-                        room.loser = loser;
-                        room.penitencia = PENITENCIAS[Math.floor(Math.random() * PENITENCIAS.length)];
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+            margin: 0;
+            padding: 12px;
+            text-align: center;
+            color: #0f172a;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            max-width: 480px;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        }
+
+        .app-header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 1px; font-weight: 900; }
+        .app-header p { margin: 4px 0 0 0; font-size: 0.8rem; opacity: 0.85; font-weight: 600; }
+
+        .lobby-card {
+            background: white; padding: 24px; border-radius: 16px; max-width: 480px;
+            margin: 0 auto; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
+        }
+
+        .rooms-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0; }
+        .btn-room-select {
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 0;
+            font-weight: 800; font-size: 1.1rem; color: var(--slate); cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn-room-select.active { background: var(--blue); border-color: var(--blue); color: white; transform: scale(1.05); }
+
+        .rules-box {
+            background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px;
+            text-align: left; margin: 16px 0; font-size: 0.78rem; color: #475569; line-height: 1.4;
+        }
+
+        .card-container { display: flex; flex-direction: column; gap: 10px; align-items: center; max-width: 500px; margin: 0 auto; }
+        .card {
+            background: white; border: 2px solid #94a3b8; border-radius: 12px; padding: 12px; width: 95%;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: row; align-items: center;
+            gap: 12px; text-align: left; cursor: pointer; transition: transform 0.15s, border-color 0.15s; box-sizing: border-box;
+        }
+        .card.selected { border: 3px solid var(--blue); background: #eff6ff; transform: scale(1.02); }
+
+        .card-media {
+            width: 95px; min-width: 95px; height: 95px; background: #ffffff; border: 1px solid #e2e8f0;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .card-media img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; }
+
+        .card-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-header { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .card-badge {
+            font-size: 0.65rem; font-weight: 800; color: white; padding: 2px 6px; border-radius: 4px;
+            display: inline-block; margin: 2px 0; text-transform: uppercase; width: fit-content;
+        }
+        .badge-problema { background-color: var(--orange); }
+        .badge-metodo { background-color: var(--slate); }
+        .badge-visual { background-color: var(--blue); }
+        .badge-conclusion { background-color: var(--green); }
+
+        .card-title { font-size: 0.85rem; font-weight: 900; color: #1e293b; }
+        .card-formula { background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 6px; border-radius: 4px; margin: 4px 0; font-size: 0.9rem; font-weight: 800; text-align: center; }
+        .card-desc { font-size: 0.75rem; color: #475569; line-height: 1.2; }
+        .card-footer { font-size: 0.55rem; font-weight: 700; color: #94a3b8; text-align: right; margin-top: 4px; }
+
+        .btn {
+            background: var(--blue); color: white; border: none; padding: 14px 20px; border-radius: 10px;
+            font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; max-width: 500px; margin: 10px auto;
+        }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        .btn-cuadricas { background: var(--green); font-size: 1.4rem; padding: 18px; display: none; }
+        .btn-cuadricas:disabled { opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; }
+        
+        .btn-mesa { background: #dc2626; font-size: 1.4rem; padding: 18px; display: none; }
+        .btn-mesa:disabled { opacity: 0.35 !important; cursor: not-allowed !important; pointer-events: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <svg style="width:36px; height:36px; fill:none; stroke:white; stroke-width:2; margin-bottom:4px;" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <h1>MATCH CÁLCULO</h1>
+        <p>CORTE 2 | LÍMITES Y APLICACIONES</p>
+    </div>
+
+    <!-- PANTALLA 1: LOBBY -->
+    <div id="screen-lobby">
+        <div class="lobby-card">
+            <h3 style="margin-top:0; color:#1e293b;">Selecciona tu Grupo de Juego</h3>
+            <div class="rooms-grid">
+                <button class="btn-room-select active" onclick="selectRoomNumber(1, this)">1</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(2, this)">2</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(3, this)">3</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(4, this)">4</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(5, this)">5</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(6, this)">6</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(7, this)">7</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(8, this)">8</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(9, this)">9</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(10, this)">10</button>
+            </div>
+            <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
+            <div class="rules-box">
+                <b>📌 Reglas Rápidas:</b>
+                <ul style="margin: 6px 0 0 0; padding-left: 16px;">
+                    <li>Reúne a los <b>4 integrantes</b> en el grupo.</li>
+                    <li>Selecciona y <b>descarta 1 carta</b> por turno simultáneo.</li>
+                    <li>¡Junta el <b>cuarteto completo</b> de un tema para gritar <b>¡MATCH!</b></li>
+                </ul>
+            </div>
+            <button style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; font-size:0.8rem; font-weight:600;" onclick="resetRoom()">Reiniciar esta Sala</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: ESPERA -->
+    <div id="screen-waiting" style="display:none;" class="lobby-card">
+        <h3 style="margin-top:0;">GRUPO <span id="room-num"></span></h3>
+        <p>Eres el <b style="color:var(--blue);">Jugador <span id="wait-player-id"></span></b></p>
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:10px; margin:15px 0;">
+            <p style="margin:0; font-size:0.9rem; color:#1e40af;">Jugadores en la mesa:</p>
+            <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4</span>
+        </div>
+        <p style="font-size:0.8rem; color:#64748b;">Esperando compañeros...</p>
+        <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.85rem;" onclick="leaveRoom()">Salir de la Sala</button>
+    </div>
+
+    <!-- PANTALLA 3: JUEGO -->
+    <div id="screen-game" style="display:none;">
+        <div style="background:white; padding:10px; border-radius:10px; font-weight:700; margin-bottom:12px; border:1px solid #e2e8f0;">
+            GRUPO <span id="display-room-num"></span> | Eres el <span style="color:var(--blue);">Jugador <span id="my-player-id"></span></span>
+        </div>
+        <button class="btn" id="btn-pass" onclick="confirmDescarte()" disabled>Selecciona 1 carta para descartar</button>
+        <div id="my-hand" class="card-container"></div>
+        <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH CÁLCULO!</button>
+        <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡PONER MANO EN LA MESA!</button>
+        <button id="btn-restart-game" class="btn" style="background:#64748b; display:none; margin-top:15px;" onclick="leaveRoom()">Volver al Lobby / Nueva Ronda</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJKAR2WXyCfJEsWya6uAM8QKujXmZcKcY",
+            authDomain: "juego-cuadricas.firebaseapp.com",
+            databaseURL: "https://juego-cuadricas-default-rtdb.firebaseio.com",
+            projectId: "juego-cuadricas",
+            storageBucket: "juego-cuadricas.firebasestorage.app",
+            messagingSenderId: "464501554982",
+            appId: "1:464501554982:web:5be01b1df45b3f0da4cbe7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // MAZO DE CARTAS CORTE 2
+        const deckMaster = [
+            { id: 1, family: 'trayectoria', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'TRAYECTORIAS', formula: 'Límite (x,y)→(0,0) xy/(x²+y²)', desc: 'Evaluar el límite multivariable acercándose al origen por distintos caminos.', footer: 'LÍMITES', img: '' },
+            { id: 2, family: 'trayectoria', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'TRAYECTORIAS', formula: 'Caminos: y = mx, y = x²', desc: 'Aproximación por diferentes trayectorias para verificar si el límite arroja el mismo valor.', footer: 'MÉTODO DE TRAYECTORIA', img: '' },
+            { id: 3, family: 'trayectoria', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'TRAYECTORIAS', formula: 'Gráfica de Caminos', desc: 'La superficie muestra distintos niveles de altura al acercarse a (0,0).', footer: 'GRÁFICA 3D', img: 'trayectoria-3d.png' },
+            { id: 4, family: 'trayectoria', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'TRAYECTORIAS', formula: 'El límite NO EXISTE', desc: 'Como los diferentes caminos (ej. m=1 y m=2) arrojan resultados distintos, no hay límite.', footer: 'RESULTADO FINAL', img: '' },
+
+            { id: 5, family: 'lhopital', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'INDETERMINACIÓN', formula: 'Formas 0/0 ó ∞/∞', desc: 'Límite que presenta una forma matemática indeterminada al evaluar directamente.', footer: 'LÍMITES', img: '' },
+            { id: 6, family: 'lhopital', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'INDETERMINACIÓN', formula: "Regla de L'Hôpital", desc: 'Derivar el numerador y el denominador de forma independiente respecto a la variable.', footer: 'REGLA DE DERIVACIÓN', img: '' },
+            { id: 7, family: 'lhopital', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'INDETERMINACIÓN', formula: 'Continuidad Reparada', desc: 'Gráfica mostrando cómo la función se aproxima a un punto específico y definido.', footer: 'GRÁFICA 3D', img: 'lhopital-grafica.png' },
+            { id: 8, family: 'lhopital', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'INDETERMINACIÓN', formula: 'Límite Definido (Ej: L = 1/2)', desc: 'Tras aplicar la derivada y evaluar, se obtiene un valor numérico real.', footer: 'RESULTADO FINAL', img: '' },
+
+            { id: 9, family: 'polares', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'LÍMITE POLAR', formula: '√(x² + y²)', desc: 'Problema difícil de resolver algebraicamente en el sistema de coordenadas cartesianas.', footer: 'LÍMITES', img: '' },
+            { id: 10, family: 'polares', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'LÍMITE POLAR', formula: 'x=r cos(θ), y=r sin(θ)', desc: 'Sustitución polar analizando qué ocurre cuando el radio (r) tiende a cero.', footer: 'CAMBIO DE VARIABLE', img: '' },
+            { id: 11, family: 'polares', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'LÍMITE POLAR', formula: 'Acercamiento Radial', desc: 'Visualización del límite colapsando por el radio r hacia el origen sin importar el ángulo.', footer: 'GRÁFICA 3D', img: 'polares-grafica.png' },
+            { id: 12, family: 'polares', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'LÍMITE POLAR', formula: 'Independiente de θ', desc: 'El límite da el mismo valor sin depender del ángulo de acercamiento. ¡Existe!', footer: 'RESULTADO FINAL', img: '' },
+
+            { id: 13, family: 'aplicacion', badge: 'EL PROBLEMA', badgeClass: 'badge-problema', title: 'OPTIMIZACIÓN', formula: 'Max/Min Volumen', desc: 'Problema aplicado para encontrar dimensiones ideales sujetas a una restricción.', footer: 'APLICACIONES', img: '' },
+            { id: 14, family: 'aplicacion', badge: 'EL MÉTODO', badgeClass: 'badge-metodo', title: 'OPTIMIZACIÓN', formula: '∇f = λ∇g (Lagrange)', desc: 'Cálculo de gradientes y uso de Multiplicadores de Lagrange o igualación a cero.', footer: 'MULTIPLICADORES', img: '' },
+            { id: 15, family: 'aplicacion', badge: 'VISUAL 3D', badgeClass: 'badge-visual', title: 'OPTIMIZACIÓN', formula: 'Punto Máximo (Pico)', desc: 'Superficie en 3D o mapa de contornos donde se resalta el punto más alto de la función.', footer: 'GRÁFICA 3D', img: 'optimizacion-3d.png' },
+            { id: 16, family: 'aplicacion', badge: 'CONCLUSIÓN', badgeClass: 'badge-conclusion', title: 'OPTIMIZACIÓN', formula: 'V_max = 50 u³', desc: 'Las coordenadas del punto crítico representan la solución óptima del problema aplicado.', footer: 'RESULTADO FINAL', img: '' }
+        ];
+
+        const PENITENCIAS = [
+            "Resuelve en el tablero: Demuestra mediante trayectorias que el límite de xy/(x²+y²) no existe.",
+            "Resuelve en el tablero: Escribe las fórmulas de conversión de coordenadas rectangulares a polares.",
+            "Resuelve en el tablero: Explica rápidamente para qué sirven los Multiplicadores de Lagrange."
+        ];
+
+        let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false;
+
+        function selectRoomNumber(num, btn) { roomId = num; document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('selected-room-lbl').innerText = num; }
+        function resetRoom() { db.ref('rooms/room_' + roomId).remove().then(() => { alert(`Sala ${roomId} ha sido reiniciada con éxito.`); location.reload(); }); }
+        
+        function joinRoom() {
+            document.getElementById('room-num').innerText = roomId; document.getElementById('display-room-num').innerText = roomId;
+            const roomRef = db.ref('rooms/room_' + roomId);
+            roomRef.transaction((room) => {
+                if (!room) return { playersCount: 1, gameState: 'waiting', hands: {}, descartes: {}, reactions: [] };
+                if (room.gameState === 'playing' || room.gameState === 'cuadricas_claimed' || room.playersCount >= 4) return; 
+                room.playersCount = (room.playersCount || 0) + 1; return room;
+            }, (error, committed, snapshot) => {
+                if (committed && snapshot.exists()) {
+                    playerId = snapshot.val().playersCount; document.getElementById('my-player-id').innerText = playerId;
+                    document.getElementById('wait-player-id').innerText = playerId; document.getElementById('screen-lobby').style.display = 'none';
+                    document.getElementById('screen-waiting').style.display = 'block';
+                    setupDisconnectHandler(); listenRoom();
+                } else alert(`⚠️ El Grupo ${roomId} ya tiene 4 integrantes o está en juego.`);
+            });
+        }
+
+        function setupDisconnectHandler() {
+            const roomRef = db.ref('rooms/room_' + roomId);
+            roomRef.child('playersCount').onDisconnect().transaction((count) => { return (count && count > 1) ? count - 1 : (roomRef.onDisconnect().remove(), 0); });
+        }
+
+        function leaveRoom() {
+            if (roomId && playerId) {
+                db.ref('rooms/room_' + roomId).transaction((room) => {
+                    if (room) { room.playersCount = Math.max(0, (room.playersCount || 1) - 1); if (room.playersCount === 0) return null; }
+                    return room;
+                }).then(() => location.reload());
+            } else location.reload();
+        }
+
+        function listenRoom() {
+            const roomRef = db.ref('rooms/room_' + roomId);
+            roomRef.on('value', (snapshot) => {
+                const data = snapshot.val(); if (!data) return;
+                const count = data.playersCount || 0; document.getElementById('player-count').innerText = count;
+                if (count === 4 && data.gameState === 'waiting' && playerId === 1) dealCards();
+                
+                if (data.gameState === 'playing') {
+                    document.getElementById('screen-waiting').style.display = 'none'; document.getElementById('screen-game').style.display = 'block';
+                    if (data.hands && data.hands[playerId]) { myHand = data.hands[playerId]; renderHand(); checkCuadricas(); }
+                    const descartesCount = data.descartes ? Object.keys(data.descartes).length : 0;
+                    const btnPass = document.getElementById('btn-pass');
+                    if (data.descartes && data.descartes[playerId]) {
+                        btnPass.disabled = true; btnPass.innerText = `Carta confirmada. Esperando al resto... (${descartesCount}/4)`;
+                    } else {
+                        btnPass.disabled = selectedCardIndex === null; btnPass.innerText = selectedCardIndex === null ? "Selecciona 1 carta para descartar" : `Confirmar Descarte (${descartesCount}/4 listos)`;
+                    }
+                    if (descartesCount === 4 && !isRotating) { isRotating = true; ejecutarRotacionSimultanea(data.hands, data.descartes); }
+                }
+
+                if (data.gameState === 'cuadricas_claimed') {
+                    if (data.winner !== playerId) {
+                        const btnMesa = document.getElementById('btn-mesa'); btnMesa.style.display = 'block';
+                        btnMesa.disabled = hasTouchedTable; btnMesa.innerText = hasTouchedTable ? "¡MANO PUESTA!" : "¡PONER MANO EN LA MESA!";
+                        document.getElementById('btn-cuadricas').style.display = 'none'; document.getElementById('btn-pass').style.display = 'none';
+                    }
+                }
+
+                if (data.gameState === 'finished') {
+                    document.getElementById('btn-restart-game').style.display = 'block';
+                    if (data.loser === playerId) alert("¡FUISTE EL ÚLTIMO EN REACCIONAR!\n\nToma una CARTA DE PENITENCIA:\n\n" + data.penitencia);
+                    else alert(`Ronda terminada. El Jugador ${data.loser} quedó de último y debe resolver la penitencia en el tablero.`);
+                }
+            });
+        }
+
+        function dealCards() {
+            let shuffled = [...deckMaster].sort(() => Math.random() - 0.5);
+            db.ref('rooms/room_' + roomId).update({ gameState: 'playing', hands: { 1: shuffled.slice(0, 4), 2: shuffled.slice(4, 8), 3: shuffled.slice(8, 12), 4: shuffled.slice(12, 16) }, descartes: {}, reactions: [] });
+        }
+
+        function renderHand() {
+            const container = document.getElementById('my-hand'); container.innerHTML = '';
+            myHand.forEach((card, index) => {
+                if (!card) return;
+                const cardEl = document.createElement('div'); cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
+                let mediaHTML = card.img ? `<div class="card-media"><img src="${card.img}" alt="Media"></div>` : '';
+                cardEl.innerHTML = `${mediaHTML}<div class="card-content"><div class="card-header">CORTE 2</div><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div><div class="card-footer">${card.footer}</div></div>`;
+                cardEl.onclick = () => { selectedCardIndex = index; renderHand(); document.getElementById('btn-pass').disabled = false; document.getElementById('btn-pass').innerText = "Confirmar Descarte"; };
+                container.appendChild(cardEl);
+            });
+        }
+
+        function confirmDescarte() { if (selectedCardIndex !== null) db.ref(`rooms/room_${roomId}/descartes/${playerId}`).set({ card: myHand[selectedCardIndex], fromIndex: selectedCardIndex }); }
+
+        function ejecutarRotacionSimultanea(currentHands, descartes) {
+            if (playerId !== 1) { isRotating = false; return; }
+            let newHands = JSON.parse(JSON.stringify(currentHands));
+            for (let p = 1; p <= 4; p++) newHands[p].splice(descartes[p].fromIndex, 1);
+            for (let p = 1; p <= 4; p++) newHands[(p % 4) + 1].push(descartes[p].card);
+            db.ref(`rooms/room_${roomId}`).update({ hands: newHands, descartes: {} }).then(() => isRotating = false);
+        }
+
+        function checkCuadricas() {
+            if (myHand.length === 4) {
+                const isMatch = myHand.every(c => c && c.family === myHand[0].family);
+                const btnCuadricas = document.getElementById('btn-cuadricas');
+                if (isMatch) {
+                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡MATCH RECLAMADO!" : "¡MATCH CÁLCULO!";
+                } else btnCuadricas.style.display = 'none';
+            }
+        }
+
+        function claimWin() {
+            if (hasClaimedWin) return; hasClaimedWin = true;
+            document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡MATCH RECLAMADO!";
+            db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
+        }
+
+        function touchTable() {
+            if (hasTouchedTable) return; hasTouchedTable = true;
+            document.getElementById('btn-mesa').disabled = true; document.getElementById('btn-mesa').innerText = "¡MANO PUESTA!";
+            db.ref('rooms/room_' + roomId).transaction((room) => {
+                if (room) {
+                    if (!room.reactions) room.reactions = [];
+                    if (!room.reactions.includes(playerId)) room.reactions.push(playerId);
+                    if (room.reactions.length === 3) {
+                        let loser = [1, 2, 3, 4].find(p => p !== room.winner && !room.reactions.includes(p)) || room.reactions[2];
+                        room.gameState = 'finished'; room.loser = loser; room.penitencia = PENITENCIAS[Math.floor(Math.random() * PENITENCIAS.length)];
                     }
                 }
                 return room;
