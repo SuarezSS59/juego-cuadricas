@@ -98,7 +98,7 @@
 
         .center-action-box { background: rgba(15, 23, 42, 0.8); border: 2px solid #334155; padding: 15px; border-radius: 16px; backdrop-filter: blur(4px); text-align: center; width: 220px; }
         .btn-cuadricas { background: var(--green); font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px var(--green); }
-        .btn-mesa { background: #dc2626; font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; }
+        .btn-mesa { background: var(--dc2626); font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; }
         
         #modal-penitencia { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center; padding: 20px; box-sizing: border-box;}
         .modal-content { background: white; color: #0f172a; padding: 30px; border-radius: 16px; max-width: 500px; text-align: center; border: 4px solid #dc2626; }
@@ -114,26 +114,17 @@
     <div id="screen-lobby">
         <div class="lobby-card">
             <h3 style="margin-top:0;">Selecciona tu Grupo de Juego</h3>
-            <div class="rooms-grid">
-                <button class="btn-room-select active" onclick="selectRoomNumber(1, this)">1</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(2, this)">2</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(3, this)">3</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(4, this)">4</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(5, this)">5</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(6, this)">6</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(7, this)">7</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(8, this)">8</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(9, this)">9</button>
-                <button class="btn-room-select" onclick="selectRoomNumber(10, this)">10</button>
+            <div class="rooms-grid" id="rooms-grid-container">
+                <!-- Se generan dinámicamente para enlazar estado -->
             </div>
             
-            <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
+            <button class="btn" id="btn-join-room" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
             
             <div style="font-size:0.8rem; margin-top:15px; color:#475569;">
                 <b>👨‍💻 Multijugador:</b> De 2 a 4 jugadores por sala. El Jugador 1 inicia la partida.
             </div>
             
-            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="resetRoom()">🔄 Reiniciar esta Sala (Forzar limpieza)</button>
+            <button id="btn-reset-room" style="background:#dc2626; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold; width:100%; transition: all 0.2s;" onclick="resetRoom()">🔄 Reiniciar Sala Seleccionada</button>
         </div>
     </div>
 
@@ -217,7 +208,7 @@
 
             { id: 5, family: 'polares', badge: 'IDENTIFICADOR', badgeClass: 'badge-problema', title: 'POLARES', formula: 'Coordenadas Polares', desc: 'Transformación a radio y ángulo.', img: '' },
             { id: 6, family: 'polares', badge: 'HERRAMIENTA', badgeClass: 'badge-metodo', title: 'POLARES', formula: 'x=r cos(θ), y=r sin(θ)', desc: 'Sabiendo que x² + y² = r².', img: '' },
-            { id: 7, family: 'polares', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: 'POLARES', formula: 'Evaluar cuando r → 0', desc: 'El radio tiende a cero.', img: '' },
+            { id: 7, family: 'polares', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: 'POLARES', formula: 'Evaluar когда r → 0', desc: 'El radio tiende a cero.', img: '' },
             { id: 8, family: 'polares', badge: 'VISUAL', badgeClass: 'badge-visual', title: 'POLARES', formula: 'Cuadrícula Polar', desc: 'Círculos y ángulos.', img: 'polares-grafica.png' },
 
             { id: 9, family: 'lhopital', badge: 'IDENTIFICADOR', badgeClass: 'badge-problema', title: "L'HÔPITAL", formula: "Regla de L'Hôpital", desc: 'Resolver indeterminaciones.', img: '' },
@@ -241,28 +232,93 @@
         document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => `<li>${p}</li>`).join('');
 
         let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false, activePlayersCount = 0;
-        let roomListener = null;
+        let roomsStatus = {};
+
+        // Inicializar selector de salas en el lobby y escuchar estados globales
+        function initLobby() {
+            const grid = document.getElementById('rooms-grid-container');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-room-select' + (roomId === i ? ' active' : '');
+                btn.innerText = i;
+                btn.onclick = () => selectRoomNumber(i, btn);
+                btn.id = `room-btn-${i}`;
+                grid.appendChild(btn);
+            }
+
+            // Escuchar el estado de todas las salas en tiempo real para bloquear el botón de reinicio si hay partida activa
+            db.ref('rooms').on('value', (snapshot) => {
+                roomsStatus = snapshot.val() || {};
+                updateLobbyUI();
+            });
+        }
 
         function selectRoomNumber(num, btn) { 
             roomId = num; 
             document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); 
             btn.classList.add('active'); 
             document.getElementById('selected-room-lbl').innerText = num; 
+            updateLobbyUI();
+        }
+
+        function updateLobbyUI() {
+            const currentRoomData = roomsStatus['room_' + roomId];
+            const btnReset = document.getElementById('btn-reset-room');
+            const btnJoin = document.getElementById('btn-join-room');
+
+            // Verificar si la sala seleccionada está en pleno juego activo
+            const isPlaying = currentRoomData && currentRoomData.gameState === 'playing';
+
+            if (isPlaying) {
+                btnReset.disabled = true;
+                btnReset.style.background = '#94a3b8';
+                btnReset.innerText = `🔒 Sala ${roomId} en Partida (Bloqueada)`;
+            } else {
+                btnReset.disabled = false;
+                btnReset.style.background = '#dc2626';
+                btnReset.innerText = `🔄 Reiniciar Sala ${roomId}`;
+            }
+
+            // Actualizar indicadores visuales en la grilla de selección de salas
+            for (let i = 1; i <= 10; i++) {
+                const roomBtn = document.getElementById(`room-btn-${i}`);
+                if (roomBtn) {
+                    const rData = roomsStatus['room_' + i];
+                    if (rData && rData.gameState === 'playing') {
+                        roomBtn.style.borderColor = '#15803d'; // Verde indicando juego activo
+                        roomBtn.title = "Partida en curso";
+                    } else {
+                        roomBtn.style.borderColor = '#cbd5e1';
+                        roomBtn.title = "Sala disponible";
+                    }
+                }
+            }
         }
         
         function resetRoom() { 
-            // Esto marca la sala como forzada a reiniciarse, avisando a todos con alerta y sacándolos
+            const currentRoomData = roomsStatus['room_' + roomId];
+            if (currentRoomData && currentRoomData.gameState === 'playing') {
+                alert("⚠️ No puedes reiniciar esta sala porque hay una partida en curso.");
+                return;
+            }
+
             db.ref('rooms/room_' + roomId).update({ forceReset: true }).then(() => {
                 setTimeout(() => {
                     db.ref('rooms/room_' + roomId).remove().then(() => { 
                         alert(`¡La Sala ${roomId} ha sido vaciada con éxito!`); 
-                        location.reload(); 
                     });
                 }, 200);
             });
         }
         
         function joinRoom() {
+            const currentRoomData = roomsStatus['room_' + roomId];
+            if (currentRoomData && currentRoomData.gameState === 'playing') {
+                alert("⚠️ Esta sala ya se encuentra en partida activa. Selecciona otra sala.");
+                return;
+            }
+
             document.getElementById('room-num').innerText = roomId; 
             document.getElementById('display-room-num').innerText = roomId;
             const roomRef = db.ref('rooms/room_' + roomId);
@@ -276,12 +332,11 @@
                 let clients = room.clients || {};
                 let assignedId = null;
                 
-                // Buscar el primer hueco disponible del 1 al 4
                 for (let i = 1; i <= 4; i++) {
                     if (!clients[i]) { assignedId = i; break; }
                 }
                 
-                if (!assignedId) return; // Sala llena
+                if (!assignedId) return; 
                 
                 clients[assignedId] = true;
                 room.clients = clients;
@@ -291,8 +346,6 @@
                 if (committed && snapshot.exists()) {
                     const roomData = snapshot.val();
                     let clients = roomData.clients || {};
-                    
-                    // Encontrar el ID que le pertenece a esta sesión buscando el último añadido o validando
                     playerId = Number(Object.keys(clients).pop());
                     
                     document.getElementById('my-player-id').innerText = playerId;
@@ -311,7 +364,7 @@
                     
                     listenRoom();
                 } else {
-                    alert(`⚠️ La Sala ${roomId} está llena o en partida. Usa "Reiniciar esta Sala" para limpiarla.`);
+                    alert(`⚠️ La Sala ${roomId} está llena o en partida.`);
                 }
             });
         }
@@ -339,7 +392,6 @@
                 
                 if (!data) return;
                 
-                // SOLO si se presionó "Reiniciar Sala", la bandera forceReset saca a los jugadores con alerta
                 if (data.forceReset) {
                     alert("⚠️ La sala ha sido reiniciada por el anfitrión. Volviendo al menú principal...");
                     location.reload();
@@ -522,6 +574,9 @@
                 return room;
             });
         }
+
+        // Ejecutar inicialización del lobby al cargar la página
+        window.onload = initLobby;
     </script>
 </body>
 </html>
