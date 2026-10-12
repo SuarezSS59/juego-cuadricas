@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match Multivariable - Corte 2 (360°)</title>
+    <title>Match Límites - Corte 2 (360°)</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
@@ -29,7 +29,7 @@
 
         /* --- MENÚ Y LOBBY --- */
         .app-header { background: #0f172a; color: white; padding: 15px; border-bottom: 2px solid #1e3a8a; }
-        .app-header h1 { margin: 0; font-size: 1.5rem; font-weight: 900; }
+        .app-header h1 { margin: 0; font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; }
         
         .lobby-card {
             background: white; color: #0f172a; padding: 24px; border-radius: 16px; max-width: 480px;
@@ -111,7 +111,7 @@
 <body>
 
     <div class="app-header" id="header-bar">
-        <h1>MATCH CÁLCULO</h1>
+        <h1>MATCH LÍMITES</h1>
     </div>
 
     <!-- PANTALLA 1: LOBBY -->
@@ -124,12 +124,21 @@
                 <button class="btn-room-select" onclick="selectRoomNumber(3, this)">3</button>
                 <button class="btn-room-select" onclick="selectRoomNumber(4, this)">4</button>
                 <button class="btn-room-select" onclick="selectRoomNumber(5, this)">5</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(6, this)">6</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(7, this)">7</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(8, this)">8</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(9, this)">9</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(10, this)">10</button>
             </div>
+            
             <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
             
             <div style="font-size:0.8rem; margin-top:15px; color:#475569;">
                 <b>👨‍💻 Novedad:</b> Ahora pueden jugar desde 2 hasta 4 personas. El Jugador 1 debe iniciar la partida.
             </div>
+            
+            <!-- BOTÓN DE REINICIO RECUPERADO -->
+            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="resetRoom()">🔄 Reiniciar esta Sala (Si está llena o bloqueada)</button>
         </div>
     </div>
 
@@ -166,7 +175,8 @@
                 <div class="center-action-box">
                     <div style="font-size:0.8rem; margin-bottom:10px; color:#94a3b8;">SALA <span id="display-room-num"></span></div>
                     <button class="btn" id="btn-pass" onclick="confirmDescarte()" disabled>Selecciona tu descarte</button>
-                    <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH!</button>
+                    <!-- BOTÓN VICTORIA CON NUEVO NOMBRE -->
+                    <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH LÍMITES!</button>
                     <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡MANO EN LA MESA!</button>
                 </div>
             </div>
@@ -240,6 +250,13 @@
 
         function selectRoomNumber(num, btn) { roomId = num; document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('selected-room-lbl').innerText = num; }
         
+        function resetRoom() { 
+            db.ref('rooms/room_' + roomId).remove().then(() => { 
+                alert(`¡La Sala ${roomId} ha sido vaciada y limpiada con éxito!`); 
+                location.reload(); 
+            }); 
+        }
+        
         function joinRoom() {
             document.getElementById('room-num').innerText = roomId; document.getElementById('display-room-num').innerText = roomId;
             const roomRef = db.ref('rooms/room_' + roomId);
@@ -262,7 +279,9 @@
                     }
                     
                     setupDisconnectHandler(); listenRoom();
-                } else alert(`⚠️ El Grupo ${roomId} ya está lleno o la partida ya inició.`);
+                } else {
+                    alert(`⚠️ El Grupo ${roomId} parece estar lleno o trabado en un juego anterior. Por favor selecciona el grupo y presiona "Reiniciar esta Sala".`);
+                }
             });
         }
 
@@ -399,7 +418,7 @@
                 const isMatch = myHand.every(c => c && c.family === myHand[0].family);
                 const btnCuadricas = document.getElementById('btn-cuadricas');
                 if (isMatch) {
-                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡MATCH RECLAMADO!" : "¡MATCH!";
+                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡RECLAMADO!" : "¡MATCH LÍMITES!";
                 } else btnCuadricas.style.display = 'none';
             }
         }
@@ -430,4 +449,5 @@
         }
     </script>
 </body>
+</html>
 </html>
