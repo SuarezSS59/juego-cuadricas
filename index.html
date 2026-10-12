@@ -147,7 +147,6 @@
             <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4 max</span>
         </div>
 
-        <!-- CONTENEDOR DE INICIO CONDICIONAL (SOLO JUGADOR 1) -->
         <div id="host-controls" style="display:none;">
             <button id="btn-start-game" class="btn btn-start" onclick="startGame()" disabled>Faltan jugadores (Mín. 2)...</button>
         </div>
@@ -164,7 +163,6 @@
     <!-- PANTALLA 3: JUEGO (MESA 360) -->
     <div id="screen-game">
         <div class="game-grid">
-            
             <div class="slot-top" id="opp-top"></div>
             <div class="slot-left" id="opp-left"></div>
             <div class="slot-right" id="opp-right"></div>
@@ -244,7 +242,12 @@
 
         let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false, activePlayersCount = 0;
 
-        function selectRoomNumber(num, btn) { roomId = num; document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('selected-room-lbl').innerText = num; }
+        function selectRoomNumber(num, btn) { 
+            roomId = num; 
+            document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); 
+            btn.classList.add('active'); 
+            document.getElementById('selected-room-lbl').innerText = num; 
+        }
         
         function resetRoom() { 
             db.ref('rooms/room_' + roomId).remove().then(() => { 
@@ -269,14 +272,15 @@
                 return room;
             }, (error, committed, snapshot) => {
                 if (committed && snapshot.exists()) {
-                    playerId = snapshot.val().playersCount; 
+                    const roomData = snapshot.val();
+                    playerId = roomData.playersCount; 
+                    
                     document.getElementById('my-player-id').innerText = playerId;
                     document.getElementById('wait-player-id').innerText = playerId; 
                     
                     document.getElementById('screen-lobby').style.display = 'none';
                     document.getElementById('screen-waiting').style.display = 'block';
                     
-                    // Control estricto visual de roles al entrar
                     if(playerId === 1) {
                         document.getElementById('host-controls').style.display = 'block';
                         document.getElementById('wait-msg').style.display = 'none';
@@ -311,7 +315,6 @@
                 const count = data.playersCount || 1; 
                 document.getElementById('player-count').innerText = count;
                 
-                // Actualización dinámica del botón de inicio para el Jugador 1
                 if(playerId === 1) {
                     const btnStart = document.getElementById('btn-start-game');
                     if(count >= 2) {
@@ -455,13 +458,13 @@
         function claimWin() {
             if (hasClaimedWin) return; hasClaimedWin = true;
             document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡RECLAMADO!";
-            db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
+            db.ref(`rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
         }
 
         function touchTable() {
             if (hasTouchedTable) return; hasTouchedTable = true;
             document.getElementById('btn-mesa').disabled = true; document.getElementById('btn-mesa').innerText = "¡MANO PUESTA!";
-            db.ref('rooms/room_' + roomId).transaction((room) => {
+            db.ref(`rooms/room_' + roomId).transaction((room) => {
                 if (room) {
                     if (!room.reactions) room.reactions = [];
                     if (!room.reactions.includes(playerId)) room.reactions.push(playerId);
