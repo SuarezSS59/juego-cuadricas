@@ -13,7 +13,8 @@
             --orange: #ea580c;
             --green: #15803d;
             --slate: #334155;
-            --bg-gradient: radial-gradient(circle at 50% 30%, #3b0764 0%, #1e1b4b 60%, #35063E 100%);
+            /* Gradiente elegante con tonos oscuros, azul, morado y rojo vino tino */
+          --bg-gradient: radial-gradient(circle at 50% 30%, #3b0764 0%, #1e1b4b 60%, #35063E 100%);
             --table-color: radial-gradient(circle, #1e3a8a 0%, #0f172a 100%);
         }
 
@@ -29,102 +30,27 @@
             min-height: 100vh;
         }
 
-        .app-header { 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(12px); 
-            color: white; 
-            padding: 15px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
-        }
-        .app-header h1 { 
-            margin: 0; font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; 
-            background: linear-gradient(to right, #f97316, #facc15);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 0px 15px rgba(249, 115, 22, 0.3);
-        }
+        .app-header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); color: white; padding: 15px; border-bottom: 2px solid rgba(255, 255, 255, 0.1); }
+        .app-header h1 { margin: 0; font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; }
         
-        /* DISEÑO MEJORADO: Lobby "Dark Glassmorphism" con Neón */
         .lobby-card {
-            background: rgba(15, 23, 42, 0.65); /* Cristal Oscuro */
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            color: #f8fafc; 
-            padding: 30px; 
-            border-radius: 20px; 
-            max-width: 520px;
-            margin: 40px auto; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(139, 92, 246, 0.15); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); color: #0f172a; padding: 24px; border-radius: 16px; max-width: 500px;
+            margin: 30px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box;
         }
-        
-        /* Borde superior decorativo estilo Cyberpunk */
-        .lobby-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-        }
-
-        .lobby-card h3 { margin-top: 0; letter-spacing: 1px; font-size: 1.3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        /* Botones de Sala Arcade 3D */
-        .rooms-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 25px 0; }
+        .rooms-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0; }
         .btn-room-select {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 12px; 
-            padding: 12px 0;
-            font-weight: 900; font-size: 1.2rem; color: #94a3b8; 
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.4); /* Botón mecánico */
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 0;
+            font-weight: 800; font-size: 1.1rem; color: var(--slate); cursor: pointer; transition: all 0.2s;
         }
-        .btn-room-select:hover {
-            background: rgba(51, 65, 85, 0.9);
-            color: white;
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-        .btn-room-select.active { 
-            background: linear-gradient(135deg, #ea580c, #f97316); 
-            border-color: #ffedd5; 
-            color: white; 
-            transform: scale(1.1) translateY(-2px); 
-            box-shadow: 0 0 20px rgba(234, 88, 12, 0.6), inset 0 -4px 0 rgba(0, 0, 0, 0.3);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
+        .btn-room-select.active { background: var(--blue); border-color: var(--blue); color: white; transform: scale(1.05); }
 
-        /* Botón Principal (Unirse) */
-        #btn-join-room { 
-            background: linear-gradient(135deg, #2563eb, #8b5cf6); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.2); 
-            padding: 16px 20px; 
-            border-radius: 12px; 
-            font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase;
-            cursor: pointer; width: 100%; transition: all 0.2s ease; 
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4), inset 0 -3px 0 rgba(0,0,0,0.2);
-            margin-top: 10px;
-        }
-        #btn-join-room:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6), inset 0 -3px 0 rgba(0,0,0,0.2);
-        }
-        #btn-join-room:disabled { background: #475569; border:none; box-shadow:none; cursor: not-allowed; }
-        
         .btn { background: var(--blue); color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; transition: all 0.2s; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
-        .btn-start { background: linear-gradient(135deg, #16a34a, #15803d); font-size: 1.2rem; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4); }
-        .btn-start:disabled { background: #475569 !important; border:none; box-shadow:none; cursor: not-allowed !important; }
+        .btn-start { background: var(--green); font-size: 1.2rem; margin-top: 15px; }
+        .btn-start:disabled { background: #94a3b8 !important; cursor: not-allowed !important; }
 
-        .penalties-box { background: rgba(239, 68, 68, 0.1); border: 1px dashed rgba(239, 68, 68, 0.5); border-radius: 10px; padding: 12px; margin-top: 15px; text-align: left; font-size: 0.75rem; color: #fca5a5; }
-        .penalties-box h4 { margin: 0 0 6px 0; font-size: 0.85rem; color:#f87171;}
+        .penalties-box { background: #fee2e2; border: 1px dashed #ef4444; border-radius: 10px; padding: 12px; margin-top: 15px; text-align: left; font-size: 0.75rem; color: #7f1d1d; }
+        .penalties-box h4 { margin: 0 0 6px 0; font-size: 0.85rem; }
         .penalties-box li { margin-bottom: 4px; }
 
         #screen-game { display: none; width: 100vw; height: 100vh; background: var(--table-color); position: relative; }
@@ -173,37 +99,12 @@
         .card-formula { background: #f1f5f9; font-size: 0.7rem; font-weight: 800; text-align: center; padding: 4px; border-radius: 4px; margin: 4px 0; border: 1px solid #e2e8f0; }
         .card-desc { font-size: 0.55rem; color: #475569; line-height: 1.1; }
 
-        .center-action-box { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 16px; backdrop-filter: blur(8px); text-align: center; width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .center-action-box { background: rgba(15, 23, 42, 0.85); border: 2px solid #334155; padding: 15px; border-radius: 16px; backdrop-filter: blur(6px); text-align: center; width: 220px; }
+        .btn-cuadricas { background: var(--green); font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px var(--green); }
+        .btn-mesa { background: #dc2626; font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; }
         
-        /* BOTÓN DE IMAGEN MATCH LÍMITES ANIMADO */
-        .btn-cuadricas-img {
-            background: transparent;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            display: none;
-            margin: 10px auto;
-            transition: transform 0.1s ease;
-            width: 150px; 
-        }
-        .btn-cuadricas-img img {
-            width: 100%;
-            border-radius: 50%;
-            box-shadow: 0 0 25px rgba(234, 88, 12, 0.8);
-        }
-        .btn-cuadricas-img:active { transform: scale(0.92); }
-        .btn-cuadricas-img:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(80%);
-            transform: scale(0.95);
-            box-shadow: none;
-        }
-
-        .btn-mesa { background: #dc2626; font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; border: 1px solid rgba(255,255,255,0.3); }
-        
-        #modal-penitencia { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; justify-content:center; align-items:center; padding: 20px; box-sizing: border-box;}
-        .modal-content { background: white; color: #0f172a; padding: 30px; border-radius: 16px; max-width: 500px; text-align: center; border: 4px solid #dc2626; box-shadow: 0 0 50px rgba(220, 38, 38, 0.5); }
+        #modal-penitencia { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center; padding: 20px; box-sizing: border-box;}
+        .modal-content { background: white; color: #0f172a; padding: 30px; border-radius: 16px; max-width: 500px; text-align: center; border: 4px solid #dc2626; }
     </style>
 </head>
 <body>
@@ -215,42 +116,42 @@
     <!-- PANTALLA 1: LOBBY -->
     <div id="screen-lobby">
         <div class="lobby-card">
-            <h3>Selecciona tu Grupo de Juego</h3>
+            <h3 style="margin-top:0;">Selecciona tu Grupo de Juego</h3>
             <div class="rooms-grid" id="rooms-grid-container">
                 <!-- Se generan dinámicamente para enlazar estado -->
             </div>
             
             <button class="btn" id="btn-join-room" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
             
-            <div style="font-size:0.85rem; margin-top:20px; color:#94a3b8; font-weight:600;">
-                👨‍💻 Multijugador: De 2 a 4 jugadores. El Jugador 1 inicia.
+            <div style="font-size:0.8rem; margin-top:15px; color:#475569;">
+                <b>👨‍💻 Multijugador:</b> De 2 a 4 jugadores por sala. El Jugador 1 inicia la partida.
             </div>
             
-            <button id="btn-reset-room" style="background:rgba(220, 38, 38, 0.8); color:white; border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:10px; cursor:pointer; font-size:0.9rem; margin-top:25px; font-weight:bold; width:100%; transition: all 0.2s;" onclick="resetRoom()">🔄 Reiniciar Sala Seleccionada</button>
+            <button id="btn-reset-room" style="background:#dc2626; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold; width:100%; transition: all 0.2s;" onclick="resetRoom()">🔄 Reiniciar Sala Seleccionada</button>
         </div>
     </div>
 
     <!-- PANTALLA 2: ESPERA -->
     <div id="screen-waiting" style="display:none;" class="lobby-card">
-        <h3 style="margin-top:0; color:#38bdf8;">SALA <span id="room-num"></span></h3>
-        <p>Eres el <b style="color:#f8fafc;">Jugador <span id="wait-player-id"></span></b></p>
+        <h3 style="margin-top:0; color:#1e40af;">SALA <span id="room-num"></span></h3>
+        <p>Eres el <b>Jugador <span id="wait-player-id"></span></b></p>
         
-        <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; margin:20px 0; border: 1px solid rgba(255,255,255,0.05);">
-            <p style="margin:0; font-size:0.9rem; color:#93c5fd;">Jugadores en la mesa:</p>
-            <span id="player-count" style="color:#60a5fa; font-size:2.5rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4 max</span>
+        <div style="background:#eff6ff; padding:12px; border-radius:10px; margin:15px 0; border: 1px solid #bfdbfe;">
+            <p style="margin:0; font-size:0.9rem; color:#1e40af;">Jugadores en la mesa:</p>
+            <span id="player-count" style="color:var(--blue); font-size:2rem; font-weight:900;">1</span> <span style="font-size:1.2rem; font-weight:700; color:#64748b;">/ 4 max</span>
         </div>
 
         <div id="host-controls" style="display:none;">
             <button id="btn-start-game" class="btn btn-start" onclick="startGame()" disabled>Faltan jugadores (Mín. 2)...</button>
         </div>
-        <p id="wait-msg" style="font-size:0.85rem; color:#94a3b8; display:none;">Esperando a que el Jugador 1 inicie la partida...</p>
+        <p id="wait-msg" style="font-size:0.8rem; color:#64748b; display:none;">Esperando a que el Jugador 1 inicie la partida...</p>
         
         <div class="penalties-box">
             <h4>⚖️ Penitencias del Tablero (Si pierdes):</h4>
             <ul style="margin:0; padding-left:15px;" id="list-penalties"></ul>
         </div>
         
-        <button style="background:none; border:none; color:#f87171; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="leaveRoom()">Salir de la Sala</button>
+        <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.85rem; margin-top:15px;" onclick="leaveRoom()">Salir de la Sala</button>
     </div>
 
     <!-- PANTALLA 3: JUEGO (MESA 360) -->
@@ -262,42 +163,30 @@
             
             <div class="slot-center">
                 <div class="center-action-box">
-                    <div style="font-size:0.8rem; margin-bottom:10px; color:#94a3b8; letter-spacing:1px; font-weight:bold;">SALA <span id="display-room-num"></span></div>
+                    <div style="font-size:0.8rem; margin-bottom:10px; color:#94a3b8;">SALA <span id="display-room-num"></span></div>
                     <button class="btn" id="btn-pass" onclick="confirmDescarte()" disabled>Selecciona tu descarte</button>
-                    
-                    <!-- BOTÓN DE IMAGEN INCORPORADO AQUÍ -->
-                    <button class="btn-cuadricas-img" id="btn-cuadricas" onclick="claimWin()">
-                        <img src="boton-match.jpeg" alt="Match Límites">
-                    </button>
-                    
+                    <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH LÍMITES!</button>
                     <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡MANO EN LA MESA!</button>
                 </div>
             </div>
 
             <div class="slot-bottom">
-                <div style="font-size:0.8rem; margin-bottom:8px; font-weight:bold; color:#93c5fd; letter-spacing: 1px;">TUS CARTAS (JUGADOR <span id="my-player-id"></span>)</div>
+                <div style="font-size:0.8rem; margin-bottom:8px; font-weight:bold; color:#93c5fd;">TUS CARTAS (Jugador <span id="my-player-id"></span>)</div>
                 <div id="my-hand" class="my-hand-container"></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PENITENCIA (CON ANUNCIO DE GANADOR Y PERDEDOR) -->
+    <!-- MODAL PENITENCIA -->
     <div id="modal-penitencia">
         <div class="modal-content">
             <h1 style="color:#dc2626; margin-top:0;">¡TENEMOS UN PERDEDOR! 🚨</h1>
-            
-            <!-- ANUNCIO DEL GANADOR AQUÍ -->
-            <div style="background:#dcfce7; border:2px dashed #15803d; padding:10px; border-radius:10px; margin:15px 0;">
-                <p style="font-size:1.1rem; margin:0; color:#14532d;">🏆 <b style="color:#15803d;">Jugador <span id="winner-id">X</span></b> completó el MATCH primero.</p>
-            </div>
-
-            <p style="font-size:1.2rem; color:#475569;">El <b id="loser-id" style="color:#1e40af;">Jugador X</b> fue el último en reaccionar.</p>
-            
+            <p style="font-size:1.2rem;">El <b id="loser-id" style="color:#1e40af;">Jugador X</b> fue el último en reaccionar.</p>
             <div style="background:#fee2e2; border:2px dashed #dc2626; padding:15px; border-radius:10px; margin:20px 0;">
                 <h3 style="margin:0 0 10px 0; color:#991b1b;">EJERCICIO DE PENITENCIA:</h3>
                 <b style="font-size:1.05rem; color:#7f1d1d;" id="loser-penitencia"></b>
             </div>
-            <button class="btn" style="background:#334155; box-shadow:none; border:none;" onclick="leaveRoom()">Salir al Lobby</button>
+            <button class="btn" style="background:#334155;" onclick="leaveRoom()">Salir al Lobby</button>
         </div>
     </div>
 
@@ -343,11 +232,12 @@
             "Resuelve en el tablero (Aplicaciones): Halla el valor o analiza la estabilidad del campo térmico T(x,y) = (x² - y²) / (x² + y²) en el origen."
         ];
 
-        document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => <li>${p}</li>).join('');
+        document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => `<li>${p}</li>`).join('');
 
         let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false, activePlayersCount = 0;
         let roomsStatus = {};
 
+        // Inicializar selector de salas en el lobby y escuchar estados globales
         function initLobby() {
             const grid = document.getElementById('rooms-grid-container');
             grid.innerHTML = '';
@@ -356,10 +246,11 @@
                 btn.className = 'btn-room-select' + (roomId === i ? ' active' : '');
                 btn.innerText = i;
                 btn.onclick = () => selectRoomNumber(i, btn);
-                btn.id = room-btn-${i};
+                btn.id = `room-btn-${i}`;
                 grid.appendChild(btn);
             }
 
+            // Escuchar el estado de todas las salas en tiempo real para bloquear el botón de reinicio si hay partida activa
             db.ref('rooms').on('value', (snapshot) => {
                 roomsStatus = snapshot.val() || {};
                 updateLobbyUI();
@@ -379,31 +270,29 @@
             const btnReset = document.getElementById('btn-reset-room');
             const btnJoin = document.getElementById('btn-join-room');
 
+            // Verificar si la sala seleccionada está en pleno juego activo
             const isPlaying = currentRoomData && currentRoomData.gameState === 'playing';
 
             if (isPlaying) {
                 btnReset.disabled = true;
-                btnReset.style.background = 'rgba(71, 85, 105, 0.8)';
-                btnReset.style.borderColor = 'transparent';
-                btnReset.innerText = 🔒 Sala ${roomId} en Partida (Bloqueada);
+                btnReset.style.background = '#94a3b8';
+                btnReset.innerText = `🔒 Sala ${roomId} en Partida (Bloqueada)`;
             } else {
                 btnReset.disabled = false;
-                btnReset.style.background = 'rgba(220, 38, 38, 0.8)';
-                btnReset.style.borderColor = 'rgba(255,255,255,0.2)';
-                btnReset.innerText = 🔄 Reiniciar Sala ${roomId};
+                btnReset.style.background = '#dc2626';
+                btnReset.innerText = `🔄 Reiniciar Sala ${roomId}`;
             }
 
+            // Actualizar indicadores visuales en la grilla de selección de salas
             for (let i = 1; i <= 10; i++) {
-                const roomBtn = document.getElementById(room-btn-${i});
+                const roomBtn = document.getElementById(`room-btn-${i}`);
                 if (roomBtn) {
                     const rData = roomsStatus['room_' + i];
                     if (rData && rData.gameState === 'playing') {
-                        roomBtn.style.borderColor = '#15803d'; 
-                        roomBtn.style.boxShadow = 'inset 0 -4px 0 #14532d, 0 0 10px rgba(21, 128, 61, 0.5)';
+                        roomBtn.style.borderColor = '#15803d'; // Verde indicando juego activo
                         roomBtn.title = "Partida en curso";
                     } else {
-                        roomBtn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                        roomBtn.style.boxShadow = 'inset 0 -4px 0 rgba(0, 0, 0, 0.4)';
+                        roomBtn.style.borderColor = '#cbd5e1';
                         roomBtn.title = "Sala disponible";
                     }
                 }
@@ -420,7 +309,7 @@
             db.ref('rooms/room_' + roomId).update({ forceReset: true }).then(() => {
                 setTimeout(() => {
                     db.ref('rooms/room_' + roomId).remove().then(() => { 
-                        alert(¡La Sala ${roomId} ha sido vaciada con éxito!); 
+                        alert(`¡La Sala ${roomId} ha sido vaciada con éxito!`); 
                     });
                 }, 200);
             });
@@ -478,7 +367,7 @@
                     
                     listenRoom();
                 } else {
-                    alert(⚠️ La Sala ${roomId} está llena o en partida.);
+                    alert(`⚠️ La Sala ${roomId} está llena o en partida.`);
                 }
             });
         }
@@ -524,7 +413,7 @@
                     const btnStart = document.getElementById('btn-start-game');
                     if(count >= 2) {
                         btnStart.disabled = false;
-                        btnStart.innerText = ¡Iniciar Partida (${count} Jugadores)!;
+                        btnStart.innerText = `¡Iniciar Partida (${count} Jugadores)!`;
                     } else {
                         btnStart.disabled = true;
                         btnStart.innerText = "Faltan jugadores (Mín. 2)...";
@@ -549,10 +438,10 @@
                     const btnPass = document.getElementById('btn-pass');
                     if (data.descartes && data.descartes[playerId]) {
                         btnPass.disabled = true; 
-                        btnPass.innerText = Esperando a los demás (${descartesCount}/${activePlayersCount});
+                        btnPass.innerText = `Esperando a los demás (${descartesCount}/${activePlayersCount})`;
                     } else {
                         btnPass.disabled = selectedCardIndex === null; 
-                        btnPass.innerText = selectedCardIndex === null ? "Selecciona tu descarte" : Confirmar Descarte;
+                        btnPass.innerText = selectedCardIndex === null ? "Selecciona tu descarte" : `Confirmar Descarte`;
                     }
                     
                     if (descartesCount === activePlayersCount && !isRotating && playerId === 1) { 
@@ -572,10 +461,8 @@
                     }
                 }
 
-                // NUEVO LOGICA: ACTUALIZANDO EL MODAL CON EL GANADOR
                 if (data.gameState === 'finished') {
                     document.getElementById('modal-penitencia').style.display = 'flex';
-                    document.getElementById('winner-id').innerText = data.winner;
                     document.getElementById('loser-id').innerText = "Jugador " + data.loser;
                     document.getElementById('loser-penitencia').innerText = data.penitencia;
                 }
@@ -641,8 +528,8 @@
             myHand.forEach((card, index) => {
                 if (!card) return;
                 const cardEl = document.createElement('div'); cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
-                let mediaHTML = card.img ? <div class="card-img"><img src="${card.img}"></div> : '';
-                cardEl.innerHTML = ${mediaHTML}<div class="card-body"><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div></div>;
+                let mediaHTML = card.img ? `<div class="card-img"><img src="${card.img}"></div>` : '';
+                cardEl.innerHTML = `${mediaHTML}<div class="card-body"><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div></div>`;
                 cardEl.onclick = () => { selectedCardIndex = index; renderHand(); document.getElementById('btn-pass').disabled = false; document.getElementById('btn-pass').innerText = "Confirmar Descarte"; };
                 container.appendChild(cardEl);
             });
@@ -657,21 +544,19 @@
             db.ref('rooms/room_' + roomId).update({ hands: newHands, descartes: {} }).then(() => isRotating = false);
         }
 
-        // NUEVO LÓGICA PARA EL BOTÓN IMAGEN
         function checkCuadricas() {
             if (myHand.length === 4) {
                 const isMatch = myHand.every(c => c && c.family === myHand[0].family);
                 const btnCuadricas = document.getElementById('btn-cuadricas');
                 if (isMatch) {
-                    btnCuadricas.style.display = 'block'; 
-                    btnCuadricas.disabled = hasClaimedWin; 
+                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡RECLAMADO!" : "¡MATCH LÍMITES!";
                 } else btnCuadricas.style.display = 'none';
             }
         }
 
         function claimWin() {
             if (hasClaimedWin) return; hasClaimedWin = true;
-            document.getElementById('btn-cuadricas').disabled = true; 
+            document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡RECLAMADO!";
             db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
         }
 
@@ -693,6 +578,7 @@
             });
         }
 
+        // Ejecutar inicialización del lobby al cargar la página
         window.onload = initLobby;
     </script>
 </body>
