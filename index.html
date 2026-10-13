@@ -97,8 +97,32 @@
         .card-desc { font-size: 0.55rem; color: #475569; line-height: 1.1; }
 
         .center-action-box { background: rgba(15, 23, 42, 0.8); border: 2px solid #334155; padding: 15px; border-radius: 16px; backdrop-filter: blur(4px); text-align: center; width: 220px; }
-        .btn-cuadricas { background: var(--green); font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px var(--green); }
-        .btn-mesa { background: var(--dc2626); font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; }
+        
+        /* NUEVO BOTÓN DE IMAGEN MATCH LÍMITES */
+        .btn-cuadricas-img {
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: none;
+            margin: 10px auto;
+            transition: transform 0.1s ease;
+            width: 150px; /* Tamaño ajustable */
+        }
+        .btn-cuadricas-img img {
+            width: 100%;
+            border-radius: 50%; /* Si la imagen es cuadrada, esto la hace redonda */
+            box-shadow: 0 0 20px rgba(234, 88, 12, 0.7); /* Brillo naranja */
+        }
+        .btn-cuadricas-img:active { transform: scale(0.92); }
+        .btn-cuadricas-img:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(80%);
+            transform: scale(0.95);
+        }
+
+        .btn-mesa { background: #dc2626; font-size: 1.3rem; padding: 15px; display: none; box-shadow: 0 0 15px #dc2626; }
         
         #modal-penitencia { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:100; justify-content:center; align-items:center; padding: 20px; box-sizing: border-box;}
         .modal-content { background: white; color: #0f172a; padding: 30px; border-radius: 16px; max-width: 500px; text-align: center; border: 4px solid #dc2626; }
@@ -114,17 +138,26 @@
     <div id="screen-lobby">
         <div class="lobby-card">
             <h3 style="margin-top:0;">Selecciona tu Grupo de Juego</h3>
-            <div class="rooms-grid" id="rooms-grid-container">
-                <!-- Se generan dinámicamente para enlazar estado -->
+            <div class="rooms-grid">
+                <button class="btn-room-select active" onclick="selectRoomNumber(1, this)">1</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(2, this)">2</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(3, this)">3</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(4, this)">4</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(5, this)">5</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(6, this)">6</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(7, this)">7</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(8, this)">8</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(9, this)">9</button>
+                <button class="btn-room-select" onclick="selectRoomNumber(10, this)">10</button>
             </div>
             
-            <button class="btn" id="btn-join-room" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
+            <button class="btn" onclick="joinRoom()">Unirse al Grupo <span id="selected-room-lbl">1</span></button>
             
             <div style="font-size:0.8rem; margin-top:15px; color:#475569;">
                 <b>👨‍💻 Multijugador:</b> De 2 a 4 jugadores por sala. El Jugador 1 inicia la partida.
             </div>
             
-            <button id="btn-reset-room" style="background:#dc2626; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold; width:100%; transition: all 0.2s;" onclick="resetRoom()">🔄 Reiniciar Sala Seleccionada</button>
+            <button style="background:none; border:none; color:#dc2626; text-decoration:underline; cursor:pointer; font-size:0.9rem; margin-top:20px; font-weight:bold;" onclick="resetRoom()">🔄 Reiniciar esta Sala</button>
         </div>
     </div>
 
@@ -162,7 +195,12 @@
                 <div class="center-action-box">
                     <div style="font-size:0.8rem; margin-bottom:10px; color:#94a3b8;">SALA <span id="display-room-num"></span></div>
                     <button class="btn" id="btn-pass" onclick="confirmDescarte()" disabled>Selecciona tu descarte</button>
-                    <button class="btn btn-cuadricas" id="btn-cuadricas" onclick="claimWin()">¡MATCH LÍMITES!</button>
+                    
+                    <!-- BOTÓN DE IMAGEN -->
+                    <button class="btn-cuadricas-img" id="btn-cuadricas" onclick="claimWin()">
+                        <img src="boton-match.jpg" alt="Match Límites">
+                    </button>
+
                     <button class="btn btn-mesa" id="btn-mesa" onclick="touchTable()">¡MANO EN LA MESA!</button>
                 </div>
             </div>
@@ -174,11 +212,18 @@
         </div>
     </div>
 
-    <!-- MODAL PENITENCIA -->
+    <!-- MODAL PENITENCIA ACTUALIZADO -->
     <div id="modal-penitencia">
         <div class="modal-content">
             <h1 style="color:#dc2626; margin-top:0;">¡TENEMOS UN PERDEDOR! 🚨</h1>
-            <p style="font-size:1.2rem;">El <b id="loser-id" style="color:#1e40af;">Jugador X</b> fue el último en reaccionar.</p>
+            
+            <!-- ANUNCIO DEL GANADOR -->
+            <div style="background:#dcfce7; border:2px dashed #15803d; padding:10px; border-radius:10px; margin:15px 0;">
+                <p style="font-size:1.1rem; margin:0; color:#14532d;">🏆 <b style="color:#15803d;">Jugador <span id="winner-id">X</span></b> completó el MATCH primero.</p>
+            </div>
+
+            <p style="font-size:1.1rem; color:#475569;">El <b id="loser-id" style="color:#1e40af;">Jugador Y</b> fue el último en reaccionar en la mesa.</p>
+            
             <div style="background:#fee2e2; border:2px dashed #dc2626; padding:15px; border-radius:10px; margin:20px 0;">
                 <h3 style="margin:0 0 10px 0; color:#991b1b;">EJERCICIO DE PENITENCIA:</h3>
                 <b style="font-size:1.05rem; color:#7f1d1d;" id="loser-penitencia"></b>
@@ -208,7 +253,7 @@
 
             { id: 5, family: 'polares', badge: 'IDENTIFICADOR', badgeClass: 'badge-problema', title: 'POLARES', formula: 'Coordenadas Polares', desc: 'Transformación a radio y ángulo.', img: '' },
             { id: 6, family: 'polares', badge: 'HERRAMIENTA', badgeClass: 'badge-metodo', title: 'POLARES', formula: 'x=r cos(θ), y=r sin(θ)', desc: 'Sabiendo que x² + y² = r².', img: '' },
-            { id: 7, family: 'polares', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: 'POLARES', formula: 'Evaluar Cuando r → 0', desc: 'El radio tiende a cero.', img: '' },
+            { id: 7, family: 'polares', badge: 'REGLA DE ORO', badgeClass: 'badge-conclusion', title: 'POLARES', formula: 'Evaluar cuando r → 0', desc: 'El radio tiende a cero.', img: '' },
             { id: 8, family: 'polares', badge: 'VISUAL', badgeClass: 'badge-visual', title: 'POLARES', formula: 'Cuadrícula Polar', desc: 'Círculos y ángulos.', img: 'polares-grafica.png' },
 
             { id: 9, family: 'lhopital', badge: 'IDENTIFICADOR', badgeClass: 'badge-problema', title: "L'HÔPITAL", formula: "Regla de L'Hôpital", desc: 'Resolver indeterminaciones.', img: '' },
@@ -229,96 +274,43 @@
             "Resuelve en el tablero (Aplicaciones): Halla el valor o analiza la estabilidad del campo térmico T(x,y) = (x² - y²) / (x² + y²) en el origen."
         ];
 
-        document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => `<li>${p}</li>`).join('');
+        document.getElementById('list-penalties').innerHTML = PENITENCIAS.map(p => <li>${p}</li>).join('');
 
         let roomId = 1, playerId = null, selectedCardIndex = null, myHand = [], isRotating = false, hasTouchedTable = false, hasClaimedWin = false, activePlayersCount = 0;
-        let roomsStatus = {};
-
-        // Inicializar selector de salas en el lobby y escuchar estados globales
-        function initLobby() {
-            const grid = document.getElementById('rooms-grid-container');
-            grid.innerHTML = '';
-            for (let i = 1; i <= 10; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'btn-room-select' + (roomId === i ? ' active' : '');
-                btn.innerText = i;
-                btn.onclick = () => selectRoomNumber(i, btn);
-                btn.id = `room-btn-${i}`;
-                grid.appendChild(btn);
-            }
-
-            // Escuchar el estado de todas las salas en tiempo real para bloquear el botón de reinicio si hay partida activa
-            db.ref('rooms').on('value', (snapshot) => {
-                roomsStatus = snapshot.val() || {};
-                updateLobbyUI();
-            });
-        }
+        let roomListener = null;
 
         function selectRoomNumber(num, btn) { 
             roomId = num; 
             document.querySelectorAll('.btn-room-select').forEach(b => b.classList.remove('active')); 
             btn.classList.add('active'); 
             document.getElementById('selected-room-lbl').innerText = num; 
-            updateLobbyUI();
-        }
-
-        function updateLobbyUI() {
-            const currentRoomData = roomsStatus['room_' + roomId];
-            const btnReset = document.getElementById('btn-reset-room');
-            const btnJoin = document.getElementById('btn-join-room');
-
-            // Verificar si la sala seleccionada está en pleno juego activo
-            const isPlaying = currentRoomData && currentRoomData.gameState === 'playing';
-
-            if (isPlaying) {
-                btnReset.disabled = true;
-                btnReset.style.background = '#94a3b8';
-                btnReset.innerText = `🔒 Sala ${roomId} en Partida (Bloqueada)`;
-            } else {
-                btnReset.disabled = false;
-                btnReset.style.background = '#dc2626';
-                btnReset.innerText = `🔄 Reiniciar Sala ${roomId}`;
-            }
-
-            // Actualizar indicadores visuales en la grilla de selección de salas
-            for (let i = 1; i <= 10; i++) {
-                const roomBtn = document.getElementById(`room-btn-${i}`);
-                if (roomBtn) {
-                    const rData = roomsStatus['room_' + i];
-                    if (rData && rData.gameState === 'playing') {
-                        roomBtn.style.borderColor = '#15803d'; // Verde indicando juego activo
-                        roomBtn.title = "Partida en curso";
-                    } else {
-                        roomBtn.style.borderColor = '#cbd5e1';
-                        roomBtn.title = "Sala disponible";
-                    }
-                }
-            }
         }
         
+        // REINICIO PROTEGIDO CONTRA TROLES
         function resetRoom() { 
-            const currentRoomData = roomsStatus['room_' + roomId];
-            if (currentRoomData && currentRoomData.gameState === 'playing') {
-                alert("⚠️ No puedes reiniciar esta sala porque hay una partida en curso.");
-                return;
-            }
-
-            db.ref('rooms/room_' + roomId).update({ forceReset: true }).then(() => {
-                setTimeout(() => {
-                    db.ref('rooms/room_' + roomId).remove().then(() => { 
-                        alert(`¡La Sala ${roomId} ha sido vaciada con éxito!`); 
-                    });
-                }, 200);
+            const roomRef = db.ref('rooms/room_' + roomId);
+            roomRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                
+                // Si la sala está activa jugando, bloquea el reseteo
+                if (data && data.gameState === 'playing') {
+                    alert(⚠️ ¡Bloqueado! La Sala ${roomId} está en plena partida. No puedes interrumpirla para reiniciarla.);
+                    return;
+                }
+                
+                // Si no está jugando, procede con el reinicio forzado
+                roomRef.update({ forceReset: true }).then(() => {
+                    setTimeout(() => {
+                        roomRef.remove().then(() => { 
+                            alert(¡La Sala ${roomId} ha sido limpiada y está disponible!); 
+                            location.reload(); 
+                        });
+                    }, 200);
+                });
             });
         }
         
         function joinRoom() {
-            const currentRoomData = roomsStatus['room_' + roomId];
-            if (currentRoomData && currentRoomData.gameState === 'playing') {
-                alert("⚠️ Esta sala ya se encuentra en partida activa. Selecciona otra sala.");
-                return;
-            }
-
             document.getElementById('room-num').innerText = roomId; 
             document.getElementById('display-room-num').innerText = roomId;
             const roomRef = db.ref('rooms/room_' + roomId);
@@ -336,7 +328,7 @@
                     if (!clients[i]) { assignedId = i; break; }
                 }
                 
-                if (!assignedId) return; 
+                if (!assignedId) return; // Sala llena
                 
                 clients[assignedId] = true;
                 room.clients = clients;
@@ -346,6 +338,7 @@
                 if (committed && snapshot.exists()) {
                     const roomData = snapshot.val();
                     let clients = roomData.clients || {};
+                    
                     playerId = Number(Object.keys(clients).pop());
                     
                     document.getElementById('my-player-id').innerText = playerId;
@@ -364,7 +357,7 @@
                     
                     listenRoom();
                 } else {
-                    alert(`⚠️ La Sala ${roomId} está llena o en partida.`);
+                    alert(⚠️ La Sala ${roomId} está llena o en partida. Espera a que terminen o usa otra sala.);
                 }
             });
         }
@@ -393,7 +386,7 @@
                 if (!data) return;
                 
                 if (data.forceReset) {
-                    alert("⚠️ La sala ha sido reiniciada por el anfitrión. Volviendo al menú principal...");
+                    alert("⚠️ La sala ha sido reiniciada. Volviendo al menú principal...");
                     location.reload();
                     return;
                 }
@@ -410,7 +403,7 @@
                     const btnStart = document.getElementById('btn-start-game');
                     if(count >= 2) {
                         btnStart.disabled = false;
-                        btnStart.innerText = `¡Iniciar Partida (${count} Jugadores)!`;
+                        btnStart.innerText = ¡Iniciar Partida (${count} Jugadores)!;
                     } else {
                         btnStart.disabled = true;
                         btnStart.innerText = "Faltan jugadores (Mín. 2)...";
@@ -435,10 +428,10 @@
                     const btnPass = document.getElementById('btn-pass');
                     if (data.descartes && data.descartes[playerId]) {
                         btnPass.disabled = true; 
-                        btnPass.innerText = `Esperando a los demás (${descartesCount}/${activePlayersCount})`;
+                        btnPass.innerText = Esperando a los demás (${descartesCount}/${activePlayersCount});
                     } else {
                         btnPass.disabled = selectedCardIndex === null; 
-                        btnPass.innerText = selectedCardIndex === null ? "Selecciona tu descarte" : `Confirmar Descarte`;
+                        btnPass.innerText = selectedCardIndex === null ? "Selecciona tu descarte" : Confirmar Descarte;
                     }
                     
                     if (descartesCount === activePlayersCount && !isRotating && playerId === 1) { 
@@ -460,6 +453,8 @@
 
                 if (data.gameState === 'finished') {
                     document.getElementById('modal-penitencia').style.display = 'flex';
+                    // NUEVO: Mostrar al ganador en el modal
+                    document.getElementById('winner-id').innerText = data.winner;
                     document.getElementById('loser-id').innerText = "Jugador " + data.loser;
                     document.getElementById('loser-penitencia').innerText = data.penitencia;
                 }
@@ -525,8 +520,8 @@
             myHand.forEach((card, index) => {
                 if (!card) return;
                 const cardEl = document.createElement('div'); cardEl.className = 'card' + (selectedCardIndex === index ? ' selected' : '');
-                let mediaHTML = card.img ? `<div class="card-img"><img src="${card.img}"></div>` : '';
-                cardEl.innerHTML = `${mediaHTML}<div class="card-body"><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div></div>`;
+                let mediaHTML = card.img ? <div class="card-img"><img src="${card.img}"></div> : '';
+                cardEl.innerHTML = ${mediaHTML}<div class="card-body"><span class="card-badge ${card.badgeClass}">${card.badge}</span><div class="card-title">${card.title}</div><div class="card-formula">${card.formula}</div><div class="card-desc">${card.desc}</div></div>;
                 cardEl.onclick = () => { selectedCardIndex = index; renderHand(); document.getElementById('btn-pass').disabled = false; document.getElementById('btn-pass').innerText = "Confirmar Descarte"; };
                 container.appendChild(cardEl);
             });
@@ -546,14 +541,18 @@
                 const isMatch = myHand.every(c => c && c.family === myHand[0].family);
                 const btnCuadricas = document.getElementById('btn-cuadricas');
                 if (isMatch) {
-                    btnCuadricas.style.display = 'block'; btnCuadricas.disabled = hasClaimedWin; btnCuadricas.innerText = hasClaimedWin ? "¡RECLAMADO!" : "¡MATCH LÍMITES!";
-                } else btnCuadricas.style.display = 'none';
+                    btnCuadricas.style.display = 'block'; 
+                    btnCuadricas.disabled = hasClaimedWin; 
+                    // Ya no cambiamos el texto porque es una imagen. Solo deshabilitamos el botón.
+                } else {
+                    btnCuadricas.style.display = 'none';
+                }
             }
         }
 
         function claimWin() {
             if (hasClaimedWin) return; hasClaimedWin = true;
-            document.getElementById('btn-cuadricas').disabled = true; document.getElementById('btn-cuadricas').innerText = "¡RECLAMADO!";
+            document.getElementById('btn-cuadricas').disabled = true; 
             db.ref('rooms/room_' + roomId).update({ gameState: 'cuadricas_claimed', winner: playerId, reactions: [] });
         }
 
@@ -574,9 +573,6 @@
                 return room;
             });
         }
-
-        // Ejecutar inicialización del lobby al cargar la página
-        window.onload = initLobby;
     </script>
 </body>
 </html>
